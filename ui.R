@@ -6,23 +6,24 @@
 #
 
 library(shiny)
+library(leafletR)
 
-shinyUI(pageWithSidebar(
+shinyUI(navbarPage("AmuseDBExplorer", id="nav",
   
-  # Application title
-  headerPanel("Old Faithful Geyser Data"),
-  
-  # Sidebar with a slider input for number of bins
-  sidebarPanel(
-    sliderInput("bins",
-                "Number of bins:",
-                min = 1,
-                max = 50,
-                value = 30)
+  tabPanel("Interactive map",
+    div(class="outer",
+               
+      tags$head(
+        # Include our custom CSS
+        includeCSS("styles.css"),
+        includeScript("gomap.js")
+      )
+    )       
   ),
   
-  # Show a plot of the generated distribution
-  mainPanel(
-    plotOutput("distPlot")
+  tabPanel("Data explorer",
+    fluidRow(
+           dataTableOutput("df.bioch")
+    )
   )
 ))
