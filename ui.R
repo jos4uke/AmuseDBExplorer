@@ -5,8 +5,8 @@
 # http://www.rstudio.com/shiny/
 #
 
-library(shiny)
-library(leafletR)
+suppressPackageStartupMessages(library(shiny))
+suppressPackageStartupMessages(library(leaflet))
 
 shinyUI(navbarPage("AmuseDBExplorer", id="nav",
   
@@ -17,13 +17,39 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         # Include our custom CSS
         includeCSS("styles.css"),
         includeScript("gomap.js")
-      )
+      ),
+      
+      #map <- leaflet(base.map="mqosm"),
+      #includeHTML(map) # browseURL(map)
+      #leafletMap("map", width="100%", height="100%",
+      #           initialTileLayer = "http//otile4.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
+      #           #initialTileLayer = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      #           initialTileLayerAttribution = HTML('© MapQuest, Map Data © OpenStreetMap contributors, ODbL'),
+      #           #options=NULL
+      #           options=list(
+      #              center = c(37.45, -93.85),
+      #              zoom = 4,
+      #              maxBounds = list(list(15.961329,-129.92981), list(52.908902,-56.80481)) # Show US only
+      #            )
+      #)
+      htmlOutput("mapp",inline=TRUE)),
+      absolutePanel(top = 60, left = "auto", right = 20, bottom = "auto",
+                  selectInput("mapPick", "Background Map",c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
+                                                            "MapQuestOSM" = "http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", # works!
+                                                            "MapQuestOpen.Aerial"= "http://oatile3.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg"), # works!
+                              selected = c("http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg")) # default: MapQuestOSM
     )       
   ),
   
-  tabPanel("Data explorer",
+#   tabPanel("Bioch data explorer (4 plants)",
+#     fluidRow(
+#            dataTableOutput("df.bioch.4p")
+#     )
+#   ),
+  
+  tabPanel("Bioch data explorer",
     fluidRow(
-           dataTableOutput("df.bioch")
+            dataTableOutput("df.bioch.4p.nomiss")
     )
   )
 ))

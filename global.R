@@ -1,5 +1,5 @@
-library(dplyr)
-library(RODBC)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(RODBC))
 
 # AmuseDB connection
 con <- odbcConnect("Amuse")
@@ -17,8 +17,8 @@ db.res <- sqlQuery(con, sql)
 # close
 odbcClose(con)
 
-# clean
-cleantable <- db.res %.%
+# 4 plants
+db.bioch.4p <- db.res %.%
   select(
     AV = av_nr,
     Culture = culture,
@@ -33,3 +33,20 @@ cleantable <- db.res %.%
     City = city,
     Country = country
   )
+## NB: missing values as ND prevent numerical sort on columns 5:10
+# accession AV2 was not filetred in sql query
+
+# 4 plants w/o missing values
+db.bioch.4p.clean <- db.bioch.4p %.%
+  filter(
+    Gal_A != "ND",
+    OsesNeutres != "ND",
+    MW != "ND",
+    IV != "ND",
+    RG != "ND",
+    RH != "ND"
+  )
+## filtering ND values allows to sort columns 5:10 numerically
+db.bioch.4p.clean[,5:10] <- sapply(5:10, function(i){
+  as.numeric(as.vector(db.bioch.4p.clean[,i]))
+})
