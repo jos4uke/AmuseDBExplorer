@@ -24,7 +24,7 @@ shinyServer(function(input, output, session) {
     })
   })
   zoom <- reactive({
-    ifelse(is.null(input$map_zoom),5,input$map_zoom)
+    ifelse(is.null(input$map_zoom),3,input$map_zoom)
   })
   center <- reactive({
     if(is.null(input$map_bounds)) {
