@@ -1,0 +1,7 @@
+Title: AmuseDBExplorer
+License: GPLv3
+DisplayMode: Normal
+Author: Joseph tran <Joseph.Tran@versailles.inra.fr>
+AuthorUrl: https://bioinfo.local/AmuseDBExplorer
+Type: Shiny
+Tags: leaflet selectize datatables absolutepanel
