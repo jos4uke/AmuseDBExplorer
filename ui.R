@@ -54,10 +54,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         sidebarPanel(
           conditionalPanel(
             'input.dataset === "raw"',
-            selectizeInput("show_mucilbiochcols", label=strong("Mucilage biochemical dataset"), 
-                        choices=choices_mucilbiochcols, 
-                        selected=choices_mucilbiochcols,
-                        multiple=TRUE)
+            #textInput("select_av",label = strong("Filter accessions by AV number"), value="All"),
+            selectizeInput("show_mucilbiochcols", label = strong("Mucilage biochemical dataset"), 
+                        choices = choices_mucilbiochcols, 
+                        selected = choices_mucilbiochcols,
+                        multiple = TRUE)
             ),
           conditionalPanel(
             'input.dataset === "mean"',
