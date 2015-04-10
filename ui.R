@@ -51,21 +51,31 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
     fluidPage(
       title="Search mucilage dataset",
       sidebarLayout(
+        ## sidebar #########################################
         sidebarPanel(
+          ### constant #########################################
           tags$strong("Filter accessions by AV number"),
           tags$textarea(id="select_av", rows=3, cols=40, "All"),
+          ### raw conditional panel #########################################
           conditionalPanel(
             'input.dataset === "raw"',
+            #### mucilage biochemical datasets
             selectizeInput("show_mucilbiochcols", label = strong("Mucilage biochemical dataset"), 
                         choices = choices_mucilbiochcols, 
                         selected = choices_mucilbiochcols,
                         multiple = TRUE),
+            #### filering Gal_A dataset #########################################
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("Gal_A") >= 0',
-              # This outputs the dynamic UI component
               uiOutput("dynamic_gala_slider")
+            ),
+            #### filtering Neutral oses dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("OsesNeutres") >= 0',
+              uiOutput("dynamic_ozn_slider")
             )
           ),
+          ### mean  #########################################
           conditionalPanel(
             'input.dataset === "mean"',
             selectInput("show_mucilbiochcols", label=strong("Mucilage biochemical dataset"), 
@@ -74,6 +84,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                            multiple=TRUE)
           )
         ),
+        ## main #########################################
         mainPanel(
           tabsetPanel(
             id="dataset",

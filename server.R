@@ -37,7 +37,9 @@ shinyServer(function(input, output, session) {
   
   ## Mucilage bioch data Explorer ###########################################
   
-  ### dynamic sliders
+  ### dynamic sliders ###########################################
+  
+  #### Gal_A range slider
   output$dynamic_gala_slider <- renderUI({
     if (!"Gal_A" %in% input$show_mucilbiochcols)
       return()
@@ -46,6 +48,18 @@ shinyServer(function(input, output, session) {
     sliderInput("gala_range", strong("Gal_A range:"),
               min = min_gala, max = max_gala, value = c(min_gala, max_gala))
   })
+  
+  #### OsesNeutres range slider ###########################################
+  output$dynamic_ozn_slider <- renderUI({
+    if (!"OsesNeutres" %in% input$show_mucilbiochcols)
+      return()
+    min_ozn <- min(db.bioch.all.clean$OsesNeutres)
+    max_ozn <- max(db.bioch.all.clean$OsesNeutres)
+    sliderInput("ozn_range", strong("OsesNeutres range:"),
+                min = min_ozn, max = max_ozn, value = c(min_ozn, max_ozn))
+  })
+  
+  ### Filtering mucilage datasets ###########################################
   
 #   ## all plants
 #   output$df.bioch.all <- renderDataTable({
@@ -64,9 +78,9 @@ shinyServer(function(input, output, session) {
   # mandatory mucilage biochemical datasets columns
   mandatory_mucilbiochcols <- names(db.bioch.all.clean)[1:4]  
 
-  ## raw
+  ### raw ###########################################
   output$raw <- renderDataTable({
-    ## filter accessions by AV number
+    #### filter accessions by AV number ###########################################
     if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
       avs <- unique(db.bioch.all.clean$AV)
     } else {
@@ -78,10 +92,10 @@ shinyServer(function(input, output, session) {
         )
 #     mucilbioch <- db.bioch.all.clean[which(db.bioch.all.clean$AV %in% avs),]
 
-    ## filter mucilage datasets
+    #### filter mucilage datasets ###########################################
     mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
 
-    ## filter gal_A range
+    #### filter Gal_A range ###########################################
     if ("Gal_A" %in% input$show_mucilbiochcols) {
       # %>% function is bugged, generating:
       ## Error in eval(substitute(expr), envir, enclos) : 
@@ -96,11 +110,21 @@ shinyServer(function(input, output, session) {
       mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]),]
     } 
 
+    #### filter OsesNeutres range ###########################################
+    if ("OsesNeutres" %in% input$show_mucilbiochcols) {
+      mucilbioch <- mucilbioch %>%
+              filter(
+                OsesNeutres >= input$ozn_range[1] & OsesNeutres <= input$ozn_range[2]
+              )
+    }
+
     # return at last
     mucilbioch
   },
   options = list(orderClasses = TRUE)
   )
 
+  ### mean ###########################################
+  # TODO
 
 })
