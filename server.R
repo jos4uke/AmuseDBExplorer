@@ -43,11 +43,23 @@ shinyServer(function(input, output, session) {
 #   },
 #   options = list(orderClasses = TRUE)
 #   )
-  
+
   ## 4 plants but no missing values
   output$df.bioch.4p.nomiss <- renderDataTable({
     db.bioch.4p.clean
   },
   options = list(orderClasses = TRUE)
   )
+
+  # mandatory mucilage biochemical datasets columns
+  mandatory_mucilbiochcols <- names(db.bioch.4p.clean)[1:4]  
+
+  ## raw: reactive to input$show_mucilbiochcols (optional)
+  output$raw <- renderDataTable({
+    db.bioch.4p.clean[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
+  },
+  options = list(orderClasses = TRUE)
+  )
+
+
 })

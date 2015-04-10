@@ -47,9 +47,34 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
 #     )
 #   ),
   
-  tabPanel("Bioch data explorer",
-    fluidRow(
-            dataTableOutput("df.bioch.4p.nomiss")
+  tabPanel("Mucilage biochemical dataset",
+    fluidPage(
+      title="Search mucilage dataset",
+      sidebarLayout(
+        sidebarPanel(
+          conditionalPanel(
+            'input.dataset === "raw"',
+            selectizeInput("show_mucilbiochcols", label=strong("Mucilage biochemical dataset"), 
+                        choices=choices_mucilbiochcols, 
+                        selected=choices_mucilbiochcols,
+                        multiple=TRUE)
+            ),
+          conditionalPanel(
+            'input.dataset === "mean"',
+            selectInput("show_mucilbiochcols", label=strong("Mucilage biochemical dataset"), 
+                           choices=choices_mucilbiochcols, 
+                           selected=choices_mucilbiochcols,
+                           multiple=TRUE)
+          )
+        ),
+        mainPanel(
+          tabsetPanel(
+            id="dataset",
+            tabPanel('raw', dataTableOutput("raw")),
+            tabPanel('mean')
+            )
+          )
+        )
+      )
     )
-  )
 ))

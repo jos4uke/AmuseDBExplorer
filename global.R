@@ -50,3 +50,13 @@ db.bioch.4p.clean <- db.bioch.4p %.%
 db.bioch.4p.clean[,5:10] <- sapply(5:10, function(i){
   as.numeric(as.vector(db.bioch.4p.clean[,i]))
 })
+
+# choices in mucilbiochcols select box
+choices_mucilbiochcols <- list(
+  "Galacturonic Acid" = 'Gal_A',
+  "Neutral oses" = 'OsesNeutres',
+  "Molecular weight" = 'MW',
+  "Intrisic viscosity" = 'IV',
+  "Giration radius" = 'RG',
+  "Hydrodynamic radius" = 'RH'
+  )
