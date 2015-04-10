@@ -52,6 +52,8 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       title="Search mucilage dataset",
       sidebarLayout(
         sidebarPanel(
+          tags$strong("Filter accessions by AV number"),
+          tags$textarea(id="select_av", rows=3, cols=40, "All"),
           conditionalPanel(
             'input.dataset === "raw"',
             #textInput("select_av",label = strong("Filter accessions by AV number"), value="All"),

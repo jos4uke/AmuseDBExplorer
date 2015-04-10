@@ -54,9 +54,22 @@ shinyServer(function(input, output, session) {
   # mandatory mucilage biochemical datasets columns
   mandatory_mucilbiochcols <- names(db.bioch.4p.clean)[1:4]  
 
-  ## raw: reactive to input$show_mucilbiochcols (optional)
+  ## raw
   output$raw <- renderDataTable({
-    db.bioch.4p.clean[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
+    ## filter accessions by AV number
+    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+      avs <- unique(db.bioch.4p.clean$AV)
+    } else {
+      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]*", perl=TRUE)))
+    }
+    mucilbioch <- db.bioch.4p.clean %>%
+      filter(
+        AV %in% avs
+        )
+    
+    ## filter mucilage datasets
+    mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
+
   },
   options = list(orderClasses = TRUE)
   )
