@@ -41,9 +41,9 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
     )       
   ),
   
-#   tabPanel("Bioch data explorer (4 plants)",
+#   tabPanel("Bioch data explorer (all plants)",
 #     fluidRow(
-#            dataTableOutput("df.bioch.4p")
+#            dataTableOutput("df.bioch.all")
 #     )
 #   ),
   

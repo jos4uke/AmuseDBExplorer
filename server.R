@@ -35,38 +35,39 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  ## Bioch data Explorer ###########################################
+  ## Mucilage bioch data Explorer ###########################################
   
-#   ## 4 plants
-#   output$df.bioch.4p <- renderDataTable({
-#     db.bioch.4p
+#   ## all plants
+#   output$df.bioch.all <- renderDataTable({
+#     db.bioch.all
 #   },
 #   options = list(orderClasses = TRUE)
 #   )
 
-  ## 4 plants but no missing values
-  output$df.bioch.4p.nomiss <- renderDataTable({
-    db.bioch.4p.clean
-  },
-  options = list(orderClasses = TRUE)
-  )
+#   ## all plants but no missing values
+#   output$df.bioch.all.nomiss <- renderDataTable({
+#     db.bioch.all.clean
+#   },
+#   options = list(orderClasses = TRUE)
+#   )
 
   # mandatory mucilage biochemical datasets columns
-  mandatory_mucilbiochcols <- names(db.bioch.4p.clean)[1:4]  
+  mandatory_mucilbiochcols <- names(db.bioch.all.clean)[1:4]  
 
   ## raw
   output$raw <- renderDataTable({
     ## filter accessions by AV number
     if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
-      avs <- unique(db.bioch.4p.clean$AV)
+      avs <- unique(db.bioch.all.clean$AV)
     } else {
       avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]*", perl=TRUE)))
     }
-    mucilbioch <- db.bioch.4p.clean %>%
+    mucilbioch <- db.bioch.all.clean %>%
       filter(
         AV %in% avs
         )
-    
+#     mucilbioch <- db.bioch.all.clean[which(db.bioch.all.clean$AV %in% avs),]
+
     ## filter mucilage datasets
     mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
 

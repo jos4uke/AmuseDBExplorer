@@ -17,8 +17,8 @@ db.res <- sqlQuery(con, sql)
 # close
 odbcClose(con)
 
-# 4 plants
-db.bioch.4p <- db.res %.%
+# all plants
+db.bioch.all <- db.res %.%
   select(
     AV = av_nr,
     Culture = culture,
@@ -36,8 +36,8 @@ db.bioch.4p <- db.res %.%
 ## NB: missing values as ND prevent numerical sort on columns 5:10
 # accession AV2 was not filetred in sql query
 
-# 4 plants w/o missing values
-db.bioch.4p.clean <- db.bioch.4p %.%
+# all plants w/o missing values
+db.bioch.all.clean <- db.bioch.all %.%
   filter(
     Gal_A != "ND",
     OsesNeutres != "ND",
@@ -47,8 +47,8 @@ db.bioch.4p.clean <- db.bioch.4p %.%
     RH != "ND"
   )
 ## filtering ND values allows to sort columns 5:10 numerically
-db.bioch.4p.clean[,5:10] <- sapply(5:10, function(i){
-  as.numeric(as.vector(db.bioch.4p.clean[,i]))
+db.bioch.all.clean[,5:10] <- sapply(5:10, function(i){
+  as.numeric(as.vector(db.bioch.all.clean[,i]))
 })
 
 # choices in mucilbiochcols select box
