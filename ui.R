@@ -56,12 +56,16 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           tags$textarea(id="select_av", rows=3, cols=40, "All"),
           conditionalPanel(
             'input.dataset === "raw"',
-            #textInput("select_av",label = strong("Filter accessions by AV number"), value="All"),
             selectizeInput("show_mucilbiochcols", label = strong("Mucilage biochemical dataset"), 
                         choices = choices_mucilbiochcols, 
                         selected = choices_mucilbiochcols,
-                        multiple = TRUE)
-            ),
+                        multiple = TRUE),
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("Gal_A") >= 0',
+              # This outputs the dynamic UI component
+              uiOutput("dynamic_gala_slider")
+            )
+          ),
           conditionalPanel(
             'input.dataset === "mean"',
             selectInput("show_mucilbiochcols", label=strong("Mucilage biochemical dataset"), 

@@ -37,6 +37,16 @@ shinyServer(function(input, output, session) {
   
   ## Mucilage bioch data Explorer ###########################################
   
+  ### dynamic sliders
+  output$dynamic_gala_slider <- renderUI({
+    if (!"Gal_A" %in% input$show_mucilbiochcols)
+      return()
+    min_gala <- min(db.bioch.all.clean$Gal_A)
+    max_gala <- max(db.bioch.all.clean$Gal_A)
+    sliderInput("gala_range", strong("Gal_A range:"),
+              min = min_gala, max = max_gala, value = c(min_gala, max_gala))
+  })
+  
 #   ## all plants
 #   output$df.bioch.all <- renderDataTable({
 #     db.bioch.all
@@ -71,6 +81,23 @@ shinyServer(function(input, output, session) {
     ## filter mucilage datasets
     mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
 
+    ## filter gal_A range
+    if ("Gal_A" %in% input$show_mucilbiochcols) {
+      # %>% function is bugged, generating:
+      ## Error in eval(substitute(expr), envir, enclos) : 
+      ##      incorrect length (0), expecting: 1272
+      #       mucilbioch %>%
+      #         filter(
+      #           Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2]
+      #         )
+      ## nor this syntax works
+      #      filter(mucilbioch, Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2])
+      ## this classical one works
+      mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]),]
+    } 
+
+    # return at last
+    mucilbioch
   },
   options = list(orderClasses = TRUE)
   )
