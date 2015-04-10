@@ -73,7 +73,8 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
             tabPanel('raw', dataTableOutput("raw")),
             tabPanel('mean')
             )
-          )
+          ),
+        position = 'right'
         )
       )
     )
