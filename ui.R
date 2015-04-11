@@ -89,6 +89,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("RG") >= 0',
               uiOutput("dynamic_rg_slider")
+            ),
+            #### filtering Hydrodynamic radius dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("RH") >= 0',
+              uiOutput("dynamic_rh_slider")
             )
           ),
           ### mean  #########################################

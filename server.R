@@ -89,6 +89,16 @@ shinyServer(function(input, output, session) {
                 min = min_rg, max = max_rg, value = c(min_rg, max_rg))
   })
   
+  #### Hydrodynamic radius range slider ###########################################
+  output$dynamic_rh_slider <- renderUI({
+    if (!"RH" %in% input$show_mucilbiochcols)
+      return()
+    min_rh <- min(db.bioch.all.clean$RH)
+    max_rh <- max(db.bioch.all.clean$RH)
+    sliderInput("rh_range", strong("RH range:"),
+                min = min_rh, max = max_rh, value = c(min_rh, max_rh))
+  })
+  
   ### Filtering mucilage datasets ###########################################
   
 #   ## all plants
@@ -169,6 +179,14 @@ shinyServer(function(input, output, session) {
       mucilbioch <- mucilbioch %>%
         filter(
           RG >= input$rg_range[1] & RG <= input$rg_range[2]
+        )
+    }
+
+    #### filter Hydrodynamic radius range ###########################################
+    if ("RH" %in% input$show_mucilbiochcols) {
+      mucilbioch <- mucilbioch %>%
+        filter(
+          RH >= input$rh_range[1] & RH <= input$rh_range[2]
         )
     }
 
