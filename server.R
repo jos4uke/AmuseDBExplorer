@@ -69,6 +69,16 @@ shinyServer(function(input, output, session) {
                 min = min_mw, max = max_mw, value = c(min_mw, max_mw))
   })
   
+  #### Intrinsic viscosity range slider ###########################################
+  output$dynamic_iv_slider <- renderUI({
+    if (!"IV" %in% input$show_mucilbiochcols)
+      return()
+    min_iv <- min(db.bioch.all.clean$IV)
+    max_iv <- max(db.bioch.all.clean$IV)
+    sliderInput("iv_range", strong("IV range:"),
+                min = min_iv, max = max_iv, value = c(min_iv, max_iv))
+  })
+  
   ### Filtering mucilage datasets ###########################################
   
 #   ## all plants
@@ -133,6 +143,14 @@ shinyServer(function(input, output, session) {
       mucilbioch <- mucilbioch %>%
         filter(
           MW >= input$mw_range[1] & MW <= input$mw_range[2]
+        )
+    }
+
+    #### filter Intrinsic viscosity range ###########################################
+    if ("IV" %in% input$show_mucilbiochcols) {
+      mucilbioch <- mucilbioch %>%
+        filter(
+          IV >= input$iv_range[1] & IV <= input$iv_range[2]
         )
     }
 

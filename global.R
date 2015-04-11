@@ -56,7 +56,7 @@ choices_mucilbiochcols <- list(
   "Galacturonic Acid" = 'Gal_A',
   "Neutral oses" = 'OsesNeutres',
   "Molecular weight" = 'MW',
-  "Intrisic viscosity" = 'IV',
+  "Intrinsic viscosity" = 'IV',
   "Giration radius" = 'RG',
   "Hydrodynamic radius" = 'RH'
   )
