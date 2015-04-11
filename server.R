@@ -133,7 +133,7 @@ shinyServer(function(input, output, session) {
 #     mucilbioch <- db.bioch.all.clean[which(db.bioch.all.clean$AV %in% avs),]
 
     #### filter mucilage datasets ###########################################
-    mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
+    mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols)]
 
     #### filter Gal_A range ###########################################
     if ("Gal_A" %in% input$show_mucilbiochcols) {
