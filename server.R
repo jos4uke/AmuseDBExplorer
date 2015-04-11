@@ -79,6 +79,16 @@ shinyServer(function(input, output, session) {
                 min = min_iv, max = max_iv, value = c(min_iv, max_iv))
   })
   
+  #### Giration radius range slider ###########################################
+  output$dynamic_rg_slider <- renderUI({
+    if (!"RG" %in% input$show_mucilbiochcols)
+      return()
+    min_rg <- min(db.bioch.all.clean$RG)
+    max_rg <- max(db.bioch.all.clean$RG)
+    sliderInput("rg_range", strong("RG range:"),
+                min = min_rg, max = max_rg, value = c(min_rg, max_rg))
+  })
+  
   ### Filtering mucilage datasets ###########################################
   
 #   ## all plants
@@ -151,6 +161,14 @@ shinyServer(function(input, output, session) {
       mucilbioch <- mucilbioch %>%
         filter(
           IV >= input$iv_range[1] & IV <= input$iv_range[2]
+        )
+    }
+
+    #### filter Giration radius range ###########################################
+    if ("RG" %in% input$show_mucilbiochcols) {
+      mucilbioch <- mucilbioch %>%
+        filter(
+          RG >= input$rg_range[1] & RG <= input$rg_range[2]
         )
     }
 

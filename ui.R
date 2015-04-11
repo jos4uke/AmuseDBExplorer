@@ -84,6 +84,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("IV") >= 0',
               uiOutput("dynamic_iv_slider")
+            ),
+            #### filtering Giration radius dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("RG") >= 0',
+              uiOutput("dynamic_rg_slider")
             )
           ),
           ### mean  #########################################
