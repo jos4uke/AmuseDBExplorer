@@ -34,7 +34,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       #)
       htmlOutput("mapp",inline=TRUE)),
       absolutePanel(top = 60, left = "auto", right = 20, bottom = "auto",
-                  selectInput("mapPick", "Background Map",c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
+                  selectInput("mapPick", strong("Background Map"),c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
                                                             "MapQuestOSM" = "http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", # works!
                                                             "MapQuestOpen.Aerial"= "http://oatile3.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg"), # works!
                               selected = c("http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg")) # default: MapQuestOSM
@@ -55,6 +55,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         sidebarPanel(
           ### constant #########################################
           tags$strong("Filter accessions by AV number"),
+          tags$br(),
           tags$textarea(id="select_av", rows=3, cols=40, "All"),
           ### raw conditional panel #########################################
           conditionalPanel(
