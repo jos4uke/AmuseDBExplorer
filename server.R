@@ -59,6 +59,16 @@ shinyServer(function(input, output, session) {
                 min = min_ozn, max = max_ozn, value = c(min_ozn, max_ozn))
   })
   
+  #### Molecular weight range slider ###########################################
+  output$dynamic_mw_slider <- renderUI({
+    if (!"MW" %in% input$show_mucilbiochcols)
+      return()
+    min_mw <- min(db.bioch.all.clean$MW)
+    max_mw <- max(db.bioch.all.clean$MW)
+    sliderInput("mw_range", strong("MW range:"),
+                min = min_mw, max = max_mw, value = c(min_mw, max_mw))
+  })
+  
   ### Filtering mucilage datasets ###########################################
   
 #   ## all plants
@@ -116,6 +126,14 @@ shinyServer(function(input, output, session) {
               filter(
                 OsesNeutres >= input$ozn_range[1] & OsesNeutres <= input$ozn_range[2]
               )
+    }
+
+    #### filter Molecular weight range ###########################################
+    if ("MW" %in% input$show_mucilbiochcols) {
+      mucilbioch <- mucilbioch %>%
+        filter(
+          MW >= input$mw_range[1] & MW <= input$mw_range[2]
+        )
     }
 
     # return at last

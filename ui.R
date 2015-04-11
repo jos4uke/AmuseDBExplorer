@@ -73,6 +73,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("OsesNeutres") >= 0',
               uiOutput("dynamic_ozn_slider")
+            ),
+            #### filtering Molecular weight dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("MW") >= 0',
+              uiOutput("dynamic_mw_slider")
             )
           ),
           ### mean  #########################################
