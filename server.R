@@ -127,7 +127,7 @@ shinyServer(function(input, output, session) {
       ## nor this syntax works
       #      filter(mucilbioch, Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2])
       ## this classical one works
-      mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]),]
+      mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]), 1:ncol(mucilbioch)]
     } 
 
     #### filter OsesNeutres range ###########################################
