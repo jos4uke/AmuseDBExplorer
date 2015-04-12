@@ -140,14 +140,14 @@ shinyServer(function(input, output, session) {
       # %>% function is bugged, generating:
       ## Error in eval(substitute(expr), envir, enclos) : 
       ##      incorrect length (0), expecting: 1272
-      #       mucilbioch %>%
-      #         filter(
-      #           Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2]
-      #         )
+      #      mucilbioch <- mucilbioch %>%
+      #        filter(
+      #          Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2]
+      #        )
       ## nor this syntax works
-      #      filter(mucilbioch, Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2])
+      #      mucilbioch <- filter(mucilbioch, Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2])
       ## this classical one works
-      mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]), 1:ncol(mucilbioch), drop=FALSE]
+      mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]), 1:ncol(mucilbioch), drop=FALSE]      
     } 
 
     #### filter OsesNeutres range ###########################################
