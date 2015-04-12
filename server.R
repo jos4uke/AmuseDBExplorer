@@ -43,8 +43,8 @@ shinyServer(function(input, output, session) {
   output$dynamic_gala_slider <- renderUI({
     if (!"Gal_A" %in% input$show_mucilbiochcols)
       return()
-    min_gala <- min(db.bioch.all.clean$Gal_A)
-    max_gala <- max(db.bioch.all.clean$Gal_A)
+    min_gala <- min(db.bioch.all.clean$Gal_A)-0.5
+    max_gala <- max(db.bioch.all.clean$Gal_A)+0.5
     sliderInput("gala_range", strong("Gal_A range:"),
               min = min_gala, max = max_gala, value = c(min_gala, max_gala))
   })
@@ -53,8 +53,8 @@ shinyServer(function(input, output, session) {
   output$dynamic_ozn_slider <- renderUI({
     if (!"OsesNeutres" %in% input$show_mucilbiochcols)
       return()
-    min_ozn <- min(db.bioch.all.clean$OsesNeutres)
-    max_ozn <- max(db.bioch.all.clean$OsesNeutres)
+    min_ozn <- min(db.bioch.all.clean$OsesNeutres)-0.5
+    max_ozn <- max(db.bioch.all.clean$OsesNeutres)+0.5
     sliderInput("ozn_range", strong("OsesNeutres range:"),
                 min = min_ozn, max = max_ozn, value = c(min_ozn, max_ozn))
   })
