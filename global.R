@@ -18,7 +18,7 @@ db.res <- sqlQuery(con, sql)
 odbcClose(con)
 
 # all plants
-db.bioch.all <- db.res %.%
+db.bioch.all <- db.res %>%
   select(
     AV = av_nr,
     Culture = culture,
@@ -37,7 +37,7 @@ db.bioch.all <- db.res %.%
 # accession AV2 was not filetred in sql query
 
 # all plants w/o missing values
-db.bioch.all.clean <- db.bioch.all %.%
+db.bioch.all.clean <- db.bioch.all %>%
   filter(
     Gal_A != "ND",
     OsesNeutres != "ND",
