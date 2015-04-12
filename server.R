@@ -198,9 +198,9 @@ shinyServer(function(input, output, session) {
 
   ### summary ###########################################
 
-  mandatory_mucilbiochsummarycols <- names(db.bioch.all.clean)[1:2]
-
   output$summary <- renderDataTable({
+    
+    mandatory_mucilbiochsummarycols <- 1
     
     #### filter accessions by AV number ###########################################
     if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
@@ -214,7 +214,10 @@ shinyServer(function(input, output, session) {
       )
     
     #### filter mucilage datasets ###########################################
-#     mucilbiochmean <- mucilbiochmean[, c(mandatory_mucilbiochsummarycols, input$show_mucilbiochsummarycols), drop=FALSE]
+    show_cols_idx <- unlist(vapply(input$show_mucilbiochsummarycols, function(d){
+      grep(pattern=d, x=names(mucilbiochsummary))
+    },FUN.VALUE=c(Min.=0, Q1=0, Median=0, Mean=0, Q3=0, Max.=0, IQR=0, sd=0)))
+    mucilbiochsummary <- mucilbiochsummary[, c(mandatory_mucilbiochsummarycols, show_cols_idx), drop=FALSE]
   
     # return at last
     mucilbiochsummary
