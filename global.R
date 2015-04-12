@@ -51,6 +51,30 @@ db.bioch.all.clean[,5:10] <- sapply(5:10, function(i){
   as.numeric(as.vector(db.bioch.all.clean[,i]))
 })
 
+# 4 plants accessions w/o missing values
+## count plants by accession
+p4 <- db.bioch.all.clean %>%
+  count(AV, sort = TRUE) %>%
+  filter(n == 4) %>%
+  select(AV)
+ 
+# db.bioch.4p.clean <- db.bioch.all.clean %>%
+#   filter(AV %in% p4$AV)
+
+# 4 plants accessions summary
+Q1 <- function(x){
+  quantile(x)[2]
+}
+
+Q3 <- function(x){
+  quantile(x)[4]
+}
+
+db.bioch.4p.summary <- db.bioch.4p.clean %>%
+  select(AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+  group_by(AV) %>%
+  summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
+  
 # choices in mucilbiochcols select box
 choices_mucilbiochcols <- list(
   "Galacturonic Acid" = 'Gal_A',

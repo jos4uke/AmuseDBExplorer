@@ -196,7 +196,30 @@ shinyServer(function(input, output, session) {
   options = list(orderClasses = TRUE)
   )
 
-  ### mean ###########################################
-  # TODO
+  ### summary ###########################################
+
+  mandatory_mucilbiochsummarycols <- names(db.bioch.all.clean)[1:2]
+
+  output$summary <- renderDataTable({
+    
+    #### filter accessions by AV number ###########################################
+    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+      avs <- p4$AV
+    } else {
+      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]*", perl=TRUE)))
+    }
+    mucilbiochsummary <- db.bioch.4p.summary %>%
+      filter(
+        AV %in% avs
+      )
+    
+    #### filter mucilage datasets ###########################################
+#     mucilbiochmean <- mucilbiochmean[, c(mandatory_mucilbiochsummarycols, input$show_mucilbiochsummarycols), drop=FALSE]
+  
+    # return at last
+    mucilbiochsummary
+  },
+  options = list(orderClasses = TRUE)
+  )
 
 })

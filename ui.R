@@ -98,11 +98,12 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           ),
           ### mean  #########################################
           conditionalPanel(
-            'input.dataset === "mean"',
-            selectInput("show_mucilbiochcols", label=strong("Mucilage biochemical dataset"), 
-                           choices=choices_mucilbiochcols, 
-                           selected=choices_mucilbiochcols,
-                           multiple=TRUE)
+            'input.dataset === "summary"',
+            #### mucilage biochemical datasets
+            selectizeInput("show_mucilbiochsummarycols", label = strong("Mucilage biochemical dataset"), 
+                           choices = choices_mucilbiochcols, 
+                           selected = choices_mucilbiochcols,
+                           multiple = TRUE)
           )
         ),
         ## main #########################################
@@ -110,7 +111,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           tabsetPanel(
             id="dataset",
             tabPanel('raw', dataTableOutput("raw")),
-            tabPanel('mean')
+            tabPanel('mean', dataTableOutput("summary"))
             )
           ),
         position = 'right'
