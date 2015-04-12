@@ -39,7 +39,7 @@ shinyServer(function(input, output, session) {
   
   ### dynamic sliders ###########################################
   
-  #### Gal_A range slider
+  #### Gal_A range slider ###########################################
   output$dynamic_gala_slider <- renderUI({
     if (!"Gal_A" %in% input$show_mucilbiochcols)
       return()
@@ -47,6 +47,16 @@ shinyServer(function(input, output, session) {
     max_gala <- max(db.bioch.all.clean$Gal_A)+0.5
     sliderInput("gala_range", strong("Gal_A range:"),
               min = min_gala, max = max_gala, value = c(min_gala, max_gala))
+  })
+  
+  #### Gal_A mean range slider 
+  output$dynamic_gala_mean_slider <- renderUI({
+    if (!"Gal_A" %in% input$show_mucilbiochsummarycols)
+      return()
+    min_gala_mean <- min(db.bioch.4p.summary$Gal_A_mean)-0.5
+    max_gala_mean <- max(db.bioch.4p.summary$Gal_A_mean)+0.5
+    sliderInput("gala_mean_range", strong("Gal_A mean range:"),
+                min = min_gala_mean, max = max_gala_mean, value = c(min_gala_mean, max_gala_mean))
   })
   
   #### OsesNeutres range slider ###########################################
@@ -218,7 +228,22 @@ shinyServer(function(input, output, session) {
       grep(pattern=d, x=names(mucilbiochsummary))
     },FUN.VALUE=c(Min.=0, Q1=0, Median=0, Mean=0, Q3=0, Max.=0, IQR=0, sd=0)))
     mucilbiochsummary <- mucilbiochsummary[, c(mandatory_mucilbiochsummarycols, show_cols_idx), drop=FALSE]
-  
+
+    #### filter Gal_A range ###########################################
+    if ("Gal_A" %in% input$show_mucilbiochsummarycols) {
+      # %>% function is bugged, generating:
+      ## Error in eval(substitute(expr), envir, enclos) : 
+      ##      incorrect length (0), expecting: 1272
+      #      mucilbiochsummary <- mucilbiochsummary %>%
+      #        filter(
+      #          Gal_A_mean >= input$gala_mean_range[1] & Gal_A_mean <= input$gala_mean_range[2]
+      #        )
+      ## nor this syntax works
+      #      mucilbiochsummary <- filter(mucilbiochsummary, Gal_A_mean >= input$gala_mean_range[1] & Gal_A_mean <= input$gala_mean_range[2])
+      ## this classical one works
+      mucilbiochsummary <- mucilbiochsummary[which(mucilbiochsummary$Gal_A_mean >= input$gala_mean_range[1] & mucilbiochsummary$Gal_A_mean <= input$gala_mean_range[2]), 1:ncol(mucilbiochsummary), drop=FALSE]      
+    }
+    
     # return at last
     mucilbiochsummary
   },

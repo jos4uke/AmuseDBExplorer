@@ -104,6 +104,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                            choices = choices_mucilbiochcols, 
                            selected = choices_mucilbiochcols,
                            multiple = TRUE)
+          ),
+          #### filering Gal_A mean dataset #########################################
+          conditionalPanel(
+            'input.show_mucilbiochsummarycols.indexOf("Gal_A") >= 0',
+            uiOutput("dynamic_gala_mean_slider")
           )
         ),
         ## main #########################################
