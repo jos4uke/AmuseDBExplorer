@@ -133,7 +133,7 @@ shinyServer(function(input, output, session) {
 #     mucilbioch <- db.bioch.all.clean[which(db.bioch.all.clean$AV %in% avs),]
 
     #### filter mucilage datasets ###########################################
-    mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols)]
+    mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
 
     #### filter Gal_A range ###########################################
     if ("Gal_A" %in% input$show_mucilbiochcols) {
@@ -147,7 +147,7 @@ shinyServer(function(input, output, session) {
       ## nor this syntax works
       #      filter(mucilbioch, Gal_A >= input$gala_range[1] & Gal_A <= input$gala_range[2])
       ## this classical one works
-      mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]), 1:ncol(mucilbioch)]
+      mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]), 1:ncol(mucilbioch), drop=FALSE]
     } 
 
     #### filter OsesNeutres range ###########################################
