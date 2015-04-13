@@ -93,8 +93,8 @@ shinyServer(function(input, output, session) {
   output$dynamic_mw_mean_slider <- renderUI({
     if (!"MW" %in% input$show_mucilbiochsummarycols)
       return()
-    min_mw_mean <- min(db.bioch.4p.summary$MW_mean)
-    max_mw_mean <- max(db.bioch.4p.summary$MW_mean)
+    min_mw_mean <- min(db.bioch.4p.summary$MW_mean)-0.5
+    max_mw_mean <- max(db.bioch.4p.summary$MW_mean)+0.5
     sliderInput("mw_mean_range", strong("MW mean range:"),
                 min = min_mw_mean, max = max_mw_mean, value = c(min_mw_mean, max_mw_mean))
   })
