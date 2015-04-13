@@ -89,6 +89,16 @@ shinyServer(function(input, output, session) {
                 min = min_mw, max = max_mw, value = c(min_mw, max_mw))
   })
   
+  #### Molecular weight mean range slider
+  output$dynamic_mw_mean_slider <- renderUI({
+    if (!"MW" %in% input$show_mucilbiochsummarycols)
+      return()
+    min_mw_mean <- min(db.bioch.4p.summary$MW_mean)
+    max_mw_mean <- max(db.bioch.4p.summary$MW_mean)
+    sliderInput("mw_mean_range", strong("MW mean range:"),
+                min = min_mw_mean, max = max_mw_mean, value = c(min_mw_mean, max_mw_mean))
+  })
+  
   #### Intrinsic viscosity range slider ###########################################
   output$dynamic_iv_slider <- renderUI({
     if (!"IV" %in% input$show_mucilbiochcols)
@@ -262,6 +272,14 @@ shinyServer(function(input, output, session) {
         )
     }
     
+    #### filter Molecular weight mean range ###########################################
+    if ("MW" %in% input$show_mucilbiochsummarycols) {
+      mucilbiochsummary <- mucilbiochsummary %>%
+        filter(
+          MW_mean >= input$mw_mean_range[1] & MW_mean <= input$mw_mean_range[2]
+        )
+    }    
+       
     # return at last
     mucilbiochsummary
   },
