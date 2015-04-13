@@ -69,6 +69,16 @@ shinyServer(function(input, output, session) {
                 min = min_ozn, max = max_ozn, value = c(min_ozn, max_ozn))
   })
   
+  #### OsesNeutres mean range slider
+  output$dynamic_ozn_mean_slider <- renderUI({
+    if (!"OsesNeutres" %in% input$show_mucilbiochsummarycols)
+      return()
+    min_ozn_mean <- min(db.bioch.4p.summary$OsesNeutres_mean)
+    max_ozn_mean <- max(db.bioch.4p.summary$OsesNeutres_mean)
+    sliderInput("ozn_mean_range", strong("OsesNeutres mean range:"),
+                min = min_ozn_mean, max = max_ozn_mean, value = c(min_ozn_mean, max_ozn_mean), round=FALSE)
+  })
+  
   #### Molecular weight range slider ###########################################
   output$dynamic_mw_slider <- renderUI({
     if (!"MW" %in% input$show_mucilbiochcols)
@@ -242,6 +252,14 @@ shinyServer(function(input, output, session) {
       #      mucilbiochsummary <- filter(mucilbiochsummary, Gal_A_mean >= input$gala_mean_range[1] & Gal_A_mean <= input$gala_mean_range[2])
       ## this classical one works
       mucilbiochsummary <- mucilbiochsummary[which(mucilbiochsummary$Gal_A_mean >= input$gala_mean_range[1] & mucilbiochsummary$Gal_A_mean <= input$gala_mean_range[2]), 1:ncol(mucilbiochsummary), drop=FALSE]      
+    }
+
+    #### filter OsesNeutres mean range ###########################################
+    if ("OsesNeutres" %in% input$show_mucilbiochsummarycols) {
+      mucilbiochsummary <- mucilbiochsummary %>%
+        filter(
+          OsesNeutres_mean >= input$ozn_mean_range[1] & OsesNeutres_mean <= input$ozn_mean_range[2]
+        )
     }
     
     # return at last
