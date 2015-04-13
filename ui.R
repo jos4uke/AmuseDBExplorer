@@ -179,9 +179,9 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
               'input.show_mucilbiochsummarycols.indexOf("Gal_A") >= 0',
               uiOutput("dynamic_gala_mean_slider")
               ),
-            #### filtering Neutral oses dataset #########################################
+            #### filtering Neutral oses mean dataset #########################################
             conditionalPanel(
-              'input.show_mucilbiochcols.indexOf("OsesNeutres") >= 0',
+              'input.show_mucilbiochsummarycols.indexOf("OsesNeutres") >= 0',
               uiOutput("dynamic_ozn_mean_slider")
             )
             )
