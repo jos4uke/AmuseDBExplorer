@@ -184,7 +184,7 @@ shinyServer(function(input, output, session) {
     if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
       avs <- unique(db.bioch.all.clean$AV)
     } else {
-      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]*", perl=TRUE)))
+      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
     }
     mucilbioch <- db.bioch.all.clean %>%
       filter(
@@ -266,7 +266,7 @@ shinyServer(function(input, output, session) {
     if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
       avs <- p4$AV
     } else {
-      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]*", perl=TRUE)))
+      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
     }
     mucilbiochsummary <- db.bioch.4p.summary %>%
       filter(
