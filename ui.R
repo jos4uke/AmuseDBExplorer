@@ -50,76 +50,127 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
   tabPanel("Mucilage biochemical dataset",
     fluidPage(
       title="Search mucilage dataset",
-      sidebarLayout(
-        ## sidebar #########################################
-        sidebarPanel(
-          ### constant #########################################
+      headerPanel("Search mucilage dataset"),
+      ### constant #########################################
+      fluidRow(
+        column(4,
           tags$strong("Filter accessions by AV number"),
           tags$br(),
-          tags$textarea(id="select_av", rows=3, cols=40, "All"),
-          ### raw conditional panel #########################################
-          conditionalPanel(
-            'input.dataset === "raw"',
-            #### mucilage biochemical datasets
-            selectizeInput("show_mucilbiochcols", label = strong("Mucilage biochemical dataset"), 
-                        choices = choices_mucilbiochcols, 
-                        selected = choices_mucilbiochcols,
-                        multiple = TRUE),
+          tags$textarea(id="select_av", rows=5, cols=40, "All")
+          ),
+        column(4,
+        tags$br(),
+        tags$div("By default, all data is shown. Provide accession AV number to filter dataset. 
+                 Multiple AV numbers is allowed separated by blank space or newline.")
+        )
+        ),
+        
+      ### raw conditional panel #########################################
+      conditionalPanel(
+        'input.dataset === "raw"',
+        #### mucilage biochemical datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+            selectizeInput("show_mucilbiochcols", label = strong("Select mucilage biochemical datasets"), 
+                    choices = choices_mucilbiochcols, 
+                    selected = choices_mucilbiochcols,
+                    multiple = TRUE)
+            ),
+          column(4,
+            tags$br(),
+            tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
+                              Mutliple choice is allowed.")
+          )
+          ),
+        fluidRow(
+          column(5,
+                 tags$br(),
+                 tags$div("Sliders allow you to filter dataset on the values range."),
+                 tags$br()
+                 )
+          ),
+        fluidRow(
+          column(4,
             #### filering Gal_A dataset #########################################
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("Gal_A") >= 0',
               uiOutput("dynamic_gala_slider")
-            ),
+              ),
             #### filtering Neutral oses dataset #########################################
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("OsesNeutres") >= 0',
               uiOutput("dynamic_ozn_slider")
+              )
             ),
+          column(4,
             #### filtering Molecular weight dataset #########################################
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("MW") >= 0',
               uiOutput("dynamic_mw_slider")
-            ),
+              ),
             #### filtering Intrinsic viscosity dataset #########################################
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("IV") >= 0',
               uiOutput("dynamic_iv_slider")
+              )
             ),
+          column(4,
             #### filtering Giration radius dataset #########################################
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("RG") >= 0',
               uiOutput("dynamic_rg_slider")
-            ),
+              ),
             #### filtering Hydrodynamic radius dataset #########################################
             conditionalPanel(
               'input.show_mucilbiochcols.indexOf("RH") >= 0',
               uiOutput("dynamic_rh_slider")
+              )
             )
-          ),
-          ### mean  #########################################
-          conditionalPanel(
-            'input.dataset === "summary"',
-            #### mucilage biochemical datasets
-            selectizeInput("show_mucilbiochsummarycols", label = strong("Mucilage biochemical dataset"), 
-                           choices = choices_mucilbiochcols, 
-                           selected = choices_mucilbiochcols,
-                           multiple = TRUE)
-          ),
-          #### filering Gal_A mean dataset #########################################
-          conditionalPanel(
-            'input.show_mucilbiochsummarycols.indexOf("Gal_A") >= 0',
-            uiOutput("dynamic_gala_mean_slider")
           )
         ),
-        ## main #########################################
-        mainPanel(
-          tabsetPanel(
-            id="dataset",
-            tabPanel('raw', dataTableOutput("raw")),
-            tabPanel('summary', dataTableOutput("summary"))
-            )
+      
+      ### mean  #########################################
+      conditionalPanel(
+        'input.dataset === "summary"',
+        #### mucilage biochemical datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+            selectizeInput("show_mucilbiochsummarycols", label = strong("Mucilage biochemical dataset"), 
+                       choices = choices_mucilbiochcols, 
+                       selected = choices_mucilbiochcols,
+                       multiple = TRUE)
+            ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
+                          Mutliple choice is allowed.")
+                 )
           ),
-        position = 'right'
+        fluidRow(
+          column(5,
+                 tags$br(),
+                 tags$div("Sliders allow you to filter dataset on the values range."),
+                 tags$br()
+          )
+        ),
+        fluidRow(
+          column(4,
+            #### filering Gal_A mean dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochsummarycols.indexOf("Gal_A") >= 0',
+              uiOutput("dynamic_gala_mean_slider")
+              )
+            )
+          )
+        ),
+      tags$hr(),        
+      ## tabsets #########################################
+      tabsetPanel(
+        id="dataset",
+        tabPanel('raw', dataTableOutput("raw")),
+        tabPanel('summary', dataTableOutput("summary"))
         )
       )
     )
