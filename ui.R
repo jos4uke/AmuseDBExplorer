@@ -141,8 +141,12 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
             )
           ),
         tags$hr(),
-        tags$br(),
+        tags$h2("Results"),
         tags$div("Raw tab view provides mucilage dataset raw values: each table entry is related to one accession, one culture, one seed pool and one repetition number."),
+        wellPanel(
+          tags$div("Download the filtered raw dataset results in csv format in zipped archive."),
+          downloadButton('downloadRawData', 'Download zip file')
+          ),
         tags$br(),
         dataTableOutput("raw")
         ),

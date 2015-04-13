@@ -179,7 +179,8 @@ shinyServer(function(input, output, session) {
   mandatory_mucilbiochcols <- names(db.bioch.all.clean)[1:4]  
 
   ### raw ###########################################
-  output$raw <- renderDataTable({
+
+  datasetRaw <- reactive({
     #### filter accessions by AV number ###########################################
     if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
       avs <- unique(db.bioch.all.clean$AV)
@@ -189,12 +190,12 @@ shinyServer(function(input, output, session) {
     mucilbioch <- db.bioch.all.clean %>%
       filter(
         AV %in% avs
-        )
-#     mucilbioch <- db.bioch.all.clean[which(db.bioch.all.clean$AV %in% avs),]
-
+      )
+    #     mucilbioch <- db.bioch.all.clean[which(db.bioch.all.clean$AV %in% avs),]
+    
     #### filter mucilage datasets ###########################################
     mucilbioch <- mucilbioch[, c(mandatory_mucilbiochcols, input$show_mucilbiochcols), drop=FALSE]
-
+    
     #### filter Gal_A range ###########################################
     if ("Gal_A" %in% input$show_mucilbiochcols) {
       # %>% function is bugged, generating:
@@ -209,15 +210,15 @@ shinyServer(function(input, output, session) {
       ## this classical one works
       mucilbioch <- mucilbioch[which(mucilbioch$Gal_A >= input$gala_range[1] & mucilbioch$Gal_A <= input$gala_range[2]), 1:ncol(mucilbioch), drop=FALSE]      
     } 
-
+    
     #### filter OsesNeutres range ###########################################
     if ("OsesNeutres" %in% input$show_mucilbiochcols) {
       mucilbioch <- mucilbioch %>%
-              filter(
-                OsesNeutres >= input$ozn_range[1] & OsesNeutres <= input$ozn_range[2]
-              )
+        filter(
+          OsesNeutres >= input$ozn_range[1] & OsesNeutres <= input$ozn_range[2]
+        )
     }
-
+    
     #### filter Molecular weight range ###########################################
     if ("MW" %in% input$show_mucilbiochcols) {
       mucilbioch <- mucilbioch %>%
@@ -225,7 +226,7 @@ shinyServer(function(input, output, session) {
           MW >= input$mw_range[1] & MW <= input$mw_range[2]
         )
     }
-
+    
     #### filter Intrinsic viscosity range ###########################################
     if ("IV" %in% input$show_mucilbiochcols) {
       mucilbioch <- mucilbioch %>%
@@ -233,7 +234,7 @@ shinyServer(function(input, output, session) {
           IV >= input$iv_range[1] & IV <= input$iv_range[2]
         )
     }
-
+    
     #### filter Giration radius range ###########################################
     if ("RG" %in% input$show_mucilbiochcols) {
       mucilbioch <- mucilbioch %>%
@@ -241,7 +242,7 @@ shinyServer(function(input, output, session) {
           RG >= input$rg_range[1] & RG <= input$rg_range[2]
         )
     }
-
+    
     #### filter Hydrodynamic radius range ###########################################
     if ("RH" %in% input$show_mucilbiochcols) {
       mucilbioch <- mucilbioch %>%
@@ -249,11 +250,62 @@ shinyServer(function(input, output, session) {
           RH >= input$rh_range[1] & RH <= input$rh_range[2]
         )
     }
-
+    
     # return at last
     mucilbioch
+  })
+
+  output$raw <- renderDataTable({
+    datasetRaw()
   },
   options = list(orderClasses = TRUE)
+  )
+
+  output$downloadRawData <- downloadHandler(
+    filename = function() { 
+      paste('AMUSE_raw_dataset_', format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss"), '.zip', sep='') 
+    },
+    content = function(file) {
+      print(file)
+      setwd(tempdir())
+      df <- datasetRaw()
+      saveTime <- format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss")
+      baseFile <- paste('AMUSE_raw_dataset_', saveTime, sep='')
+      # process csv file
+      csvFile <- paste(baseFile, '.csv', sep='')
+      write.csv(df, csvFile)
+      print(csvFile)
+      
+      # process metadata file
+      metadataFile <- paste(baseFile, '_metadata.txt', sep='')
+      sink(metadataFile)
+      cat(paste("Dataset File: ", csvFile, "\n",sep=''))
+      cat(paste("Metadata File: ", metadataFile, "\n",sep=''))
+      cat(paste("Date: ", saveTime, "\n",sep=''))
+      cat("AMUSE Raw Dataset\n")
+      cat("DataTable dimensions: ")
+      cat(dim(df), "\n")
+      cat("Filters:\n")
+      cat(paste("#AV numbers: ", length(unique(df$AV)), "\n", sep=''))
+      if ("Gal_A" %in% input$show_mucilbiochcols) 
+        cat(paste("#Gal_A range: ", input$gala_range[1], ':', input$gala_range[2], "\n", sep=''))
+      if ("OsesNeutres" %in% input$show_mucilbiochcols)
+        cat(paste("#OsesNeutres range: ", input$ozn_range[1], ":", input$ozn_range[2], "\n", sep=''))      
+      if ("MW" %in% input$show_mucilbiochcols)
+        cat(paste("#MW range: ", input$mw_range[1], ":", input$mw_range[2], "\n", sep=''))
+      if ("IV" %in% input$show_mucilbiochcols)
+        cat(paste("#IV range: ", input$iv_range[1], ":", input$iv_range[2], "\n", sep=''))
+      if ("RG" %in% input$show_mucilbiochcols)
+        cat(paste("#RG range: ", input$rg_range[1], ":", input$rg_range[2], "\n", sep=''))
+      if ("RH" %in% input$show_mucilbiochcols)
+        cat(paste("#RH range: ", input$rh_range[1], ":", input$rh_range[2], "\n", sep=''))
+      cat("Contact: Joseph.Tran@versailles.inra.fr\n")
+      sink()
+      
+      # zip
+      zip(zipfile=file, files=c(csvFile, metadataFile))
+    },
+    contentType = "application/zip"
   )
 
   ### summary ###########################################
