@@ -52,7 +52,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       title="Search mucilage dataset",
       headerPanel("Search mucilage dataset"),
       tags$br(),
-      tags$div("Raw and summary datasets are available."),
+      tags$div("Raw, summary and geoloc climate datasets are available."),
       tags$br(),
       ### dataset #########################################
       fluidRow(
