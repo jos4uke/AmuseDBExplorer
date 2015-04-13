@@ -52,7 +52,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       title="Search mucilage dataset",
       headerPanel("Search mucilage dataset"),
       tags$br(),
-      tags$div("Raw and summary datasets are available."),
+      tags$div("Raw, summary and geoloc climate datasets are available."),
       tags$br(),
       ### dataset #########################################
       fluidRow(
@@ -92,7 +92,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           column(4,
             tags$br(),
             tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
-                              Mutliple choice is allowed.")
+                              Multiple choice is allowed.")
           )
           ),
         fluidRow(
@@ -162,7 +162,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           column(4,
                  tags$br(),
                  tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
-                          Mutliple choice is allowed.")
+                          Multiple choice is allowed.")
                  )
           ),
         fluidRow(
@@ -232,11 +232,30 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           column(4,
                  tags$br(),
                  tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
-                          Mutliple choice is allowed.")
+                          Multiple choice is allowed.")
           )
         ),
+        #### gps coordinates filtering
+        fluidRow(
+          tags$br(),
+          tags$div("Sliders allow you to filter dataset on the values range."),
+          tags$br(),
+          column(4,
+                 wellPanel(
+                   #### Latitude slider ###########################################
+                     sliderInput("lat_range", strong("Latitude range:"),
+                                 min = min_lat, max = max_lat, value = c(min_lat, max_lat))
+                   )
+                 ),
+          column(4,
+                 wellPanel(
+                   #### Longitude slider ###########################################
+                   sliderInput("long_range", strong("Longitude range:"),
+                               min = min_long, max = max_long, value = c(min_long, max_long))
+                 )
+          )
+          ),
         tags$hr(),
-        tags$br(),
         tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
         tags$pre("Legend: 
   - 'MONTHLY HOURS OF SUNSHINE' = 'mhs',

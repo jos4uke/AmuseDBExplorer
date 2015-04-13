@@ -99,21 +99,28 @@ db.climate.all <- read.table(file="data/AMUSE_accession_climate_clean_data.tab",
 # dplyr::rename_(db.climate.all, .dots=setNames(list("gps_long"), "LONGITUDE"))
 # dplyr::rename_(db.climate.all, .dots=setNames(list("geo_qual"), "GEOLOC_QUAL"))
 
+names(db.climate.all)[1:8] <- c('NAME', 'AV', 'CITY', 'COUNTRY', 'ALTITUDE', 'LATITUDE', 'LONGITUDE', 'GEOLOC_QUAL')
 db.climate.geoloc <- db.climate.all %>%
   select(
-    NAME = name, 
-    AV = av,	
-    CITY = city,	
-    COUNTRY = country,	
-    ALTITUDE = alt,	
-    LATITUDE = gps_lat,	
-    LONGITUDE = gps_long,	
-    GEOLOC_QUAL = geo_qual
+    NAME, 
+    AV,	
+    CITY,	
+    COUNTRY,	
+    ALTITUDE,	
+    LATITUDE,	
+    LONGITUDE,
+    GEOLOC_QUAL
     )
 
 db.climate.geoloc[6:7] <- sapply(6:7, function(i){
   as.numeric(as.vector(db.climate.geoloc[,i]))
 })
+
+### gps cooridnates: LATITUDE/LONGITUDE
+min_lat <- min(db.climate.geoloc$LATITUDE, na.rm=TRUE)-0.5
+max_lat <- max(db.climate.geoloc$LATITUDE, na.rm=TRUE)+0.5
+min_long <- min(db.climate.geoloc$LONGITUDE, na.rm=TRUE)-0.5
+max_long <- max(db.climate.geoloc$LONGITUDE, na.rm=TRUE)+0.5
 
 # choices climatodatasets select box
 choices_climatodatasets <- list(

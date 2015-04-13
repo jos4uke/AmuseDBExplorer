@@ -359,7 +359,7 @@ shinyServer(function(input, output, session) {
         grep(pattern=paste(c,"_",sep=""), x=names(db.climate.all))
       },FUN.VALUE=c(Jan=0, Feb=0, Mar=0, Apr=0, May=0, Jun=0, Jul=0, Aug=0, Sep=0, Oct=0, Nov=0, Dec=0)))
       geoclimato <- db.climate.all %>%
-        filter(av %in% avs) %>%
+        filter(AV %in% avs) %>%
         select(one_of(names(db.climate.all)[c(mandatory_geoloccols, show_cols_idx)]))
     #### only filter by accession on geoloc dataset
     } else {
@@ -369,6 +369,13 @@ shinyServer(function(input, output, session) {
         )
     }
     
+    #### filter latitude/longitude range ###########################################
+    geoclimato <- geoclimato %>%
+      filter(
+        (LATITUDE >= input$lat_range[1] & LATITUDE <= input$lat_range[2]) | is.na(LATITUDE),
+        (LONGITUDE >= input$long_range[1] & LONGITUDE <= input$long_range[2]) | is.na(LONGITUDE)
+      ) 
+      
     # return at last
     geoclimato
   },
