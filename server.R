@@ -129,6 +129,16 @@ shinyServer(function(input, output, session) {
                 min = min_rg, max = max_rg, value = c(min_rg, max_rg))
   })
   
+  #### Giration radius range mean slider
+  output$dynamic_rg_mean_slider <- renderUI({
+    if (!"RG" %in% input$show_mucilbiochsummarycols)
+      return()
+    min_rg_mean <- min(db.bioch.4p.summary$RG_mean)-0.5
+    max_rg_mean <- max(db.bioch.4p.summary$RG_mean)+0.5
+    sliderInput("rg_mean_range", strong("RG mean range:"),
+                min = min_rg_mean, max = max_rg_mean, value = c(min_rg_mean, max_rg_mean))
+  })
+  
   #### Hydrodynamic radius range slider ###########################################
   output$dynamic_rh_slider <- renderUI({
     if (!"RH" %in% input$show_mucilbiochcols)
@@ -295,6 +305,14 @@ shinyServer(function(input, output, session) {
       mucilbiochsummary <- mucilbiochsummary %>%
         filter(
           IV_mean >= input$iv_mean_range[1] & IV_mean <= input$iv_mean_range[2]
+        )
+    }
+
+    #### filter Giration radius range ###########################################
+    if ("RG" %in% input$show_mucilbiochsummarycols) {
+      mucilbiochsummary <- mucilbiochsummary %>%
+        filter(
+          RG_mean >= input$rg_mean_range[1] & RG_mean <= input$rg_mean_range[2]
         )
     }
     

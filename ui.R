@@ -196,7 +196,14 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
               'input.show_mucilbiochsummarycols.indexOf("IV") >= 0',
               uiOutput("dynamic_iv_mean_slider")
               )
-            )
+            ),
+          column(4,
+            #### filtering Giration radius mean dataset #########################################
+            conditionalPanel(
+             'input.show_mucilbiochsummarycols.indexOf("RG") >= 0',
+             uiOutput("dynamic_rg_mean_slider")
+            )     
+                 )
           ),
         tags$hr(),
         tags$br(),
