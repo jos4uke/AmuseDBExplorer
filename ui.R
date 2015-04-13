@@ -34,22 +34,188 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       #)
       htmlOutput("mapp",inline=TRUE)),
       absolutePanel(top = 60, left = "auto", right = 20, bottom = "auto",
-                  selectInput("mapPick", "Background Map",c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
+                  selectInput("mapPick", strong("Background Map"),c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
                                                             "MapQuestOSM" = "http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", # works!
                                                             "MapQuestOpen.Aerial"= "http://oatile3.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg"), # works!
                               selected = c("http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg")) # default: MapQuestOSM
     )       
   ),
   
-#   tabPanel("Bioch data explorer (4 plants)",
+#   tabPanel("Bioch data explorer (all plants)",
 #     fluidRow(
-#            dataTableOutput("df.bioch.4p")
+#            dataTableOutput("df.bioch.all")
 #     )
 #   ),
   
-  tabPanel("Bioch data explorer",
-    fluidRow(
-            dataTableOutput("df.bioch.4p.nomiss")
+  tabPanel("Mucilage biochemical dataset",
+    fluidPage(
+      title="Search mucilage dataset",
+      headerPanel("Search mucilage dataset"),
+      tags$br(),
+      tags$div("Raw and summary datasets are available."),
+      tags$br(),
+      ### dataset #########################################
+      fluidRow(
+        column(4,
+           selectInput("dataset", label = strong("Select dataset"), 
+                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary"), 
+                       selected = list("Raw dataset" = "raw"))
+               )
+        ),
+      ### constant #########################################
+      fluidRow(
+        tags$br(),
+        column(4,
+          tags$strong("Filter accessions by AV number"),
+          tags$br(),
+          tags$textarea(id="select_av", rows=5, cols=40, "All")
+          ),
+        column(4,
+        tags$br(),
+        tags$div("By default, all data is shown. Provide accession AV number to filter dataset. 
+                 Multiple AV numbers is allowed separated by blank space or newline.")
+        )
+        ),
+        
+      ### raw conditional panel #########################################
+      conditionalPanel(
+        'input.dataset === "raw"',
+        #### mucilage biochemical datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+            selectizeInput("show_mucilbiochcols", label = strong("Select mucilage biochemical datasets"), 
+                    choices = choices_mucilbiochcols, 
+                    selected = choices_mucilbiochcols,
+                    multiple = TRUE)
+            ),
+          column(4,
+            tags$br(),
+            tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
+                              Mutliple choice is allowed.")
+          )
+          ),
+        fluidRow(
+          column(5,
+                 tags$br(),
+                 tags$div("Sliders allow you to filter dataset on the values range."),
+                 tags$br()
+                 )
+          ),
+        fluidRow(
+          column(4,
+            #### filering Gal_A dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("Gal_A") >= 0',
+              uiOutput("dynamic_gala_slider")
+              ),
+            #### filtering Neutral oses dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("OsesNeutres") >= 0',
+              uiOutput("dynamic_ozn_slider")
+              )
+            ),
+          column(4,
+            #### filtering Molecular weight dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("MW") >= 0',
+              uiOutput("dynamic_mw_slider")
+              ),
+            #### filtering Intrinsic viscosity dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("IV") >= 0',
+              uiOutput("dynamic_iv_slider")
+              )
+            ),
+          column(4,
+            #### filtering Giration radius dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("RG") >= 0',
+              uiOutput("dynamic_rg_slider")
+              ),
+            #### filtering Hydrodynamic radius dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochcols.indexOf("RH") >= 0',
+              uiOutput("dynamic_rh_slider")
+              )
+            )
+          ),
+        tags$hr(),
+        tags$br(),
+        tags$div("Raw tab view provides mucilage dataset raw values: each table entry is related to one accession, one culture, one seed pool and one repetition number."),
+        tags$br(),
+        dataTableOutput("raw")
+        ),
+      
+      ### mean  #########################################
+      conditionalPanel(
+        'input.dataset === "summary"',
+        #### mucilage biochemical datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+            selectizeInput("show_mucilbiochsummarycols", label = strong("Mucilage biochemical dataset"), 
+                       choices = choices_mucilbiochcols, 
+                       selected = choices_mucilbiochcols,
+                       multiple = TRUE)
+            ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
+                          Mutliple choice is allowed.")
+                 )
+          ),
+        fluidRow(
+          column(5,
+                 tags$br(),
+                 tags$div("Sliders allow you to filter dataset on the values range."),
+                 tags$br()
+          )
+        ),
+        fluidRow(
+          column(4,
+            #### filering Gal_A mean dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochsummarycols.indexOf("Gal_A") >= 0',
+              uiOutput("dynamic_gala_mean_slider")
+              ),
+            #### filtering Neutral oses mean dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochsummarycols.indexOf("OsesNeutres") >= 0',
+              uiOutput("dynamic_ozn_mean_slider")
+            )
+            ),
+          column(4,
+            #### filtering Molecular weight mean dataset #########################################
+            conditionalPanel(
+             'input.show_mucilbiochsummarycols.indexOf("MW") >= 0',
+             uiOutput("dynamic_mw_mean_slider")
+            ),
+            #### filtering Intrinsic viscosity mean dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochsummarycols.indexOf("IV") >= 0',
+              uiOutput("dynamic_iv_mean_slider")
+              )
+            ),
+          column(4,
+            #### filtering Giration radius mean dataset #########################################
+            conditionalPanel(
+             'input.show_mucilbiochsummarycols.indexOf("RG") >= 0',
+             uiOutput("dynamic_rg_mean_slider")
+            ),
+            #### filtering Hydrodynamic radius mean dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochsummarycols.indexOf("RH") >= 0',
+              uiOutput("dynamic_rh_mean_slider")
+            )     
+                 )
+          ),
+        tags$hr(),
+        tags$br(),
+        tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession: _min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset. Only accessions with 4 plants are considered in the summary statistics."),
+        tags$br(),
+        dataTableOutput("summary")
+        )
+      )
     )
-  )
 ))

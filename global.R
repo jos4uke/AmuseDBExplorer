@@ -17,8 +17,8 @@ db.res <- sqlQuery(con, sql)
 # close
 odbcClose(con)
 
-# 4 plants
-db.bioch.4p <- db.res %.%
+# all plants
+db.bioch.all <- db.res %>%
   select(
     AV = av_nr,
     Culture = culture,
@@ -36,8 +36,8 @@ db.bioch.4p <- db.res %.%
 ## NB: missing values as ND prevent numerical sort on columns 5:10
 # accession AV2 was not filetred in sql query
 
-# 4 plants w/o missing values
-db.bioch.4p.clean <- db.bioch.4p %.%
+# all plants w/o missing values
+db.bioch.all.clean <- db.bioch.all %>%
   filter(
     Gal_A != "ND",
     OsesNeutres != "ND",
@@ -47,6 +47,40 @@ db.bioch.4p.clean <- db.bioch.4p %.%
     RH != "ND"
   )
 ## filtering ND values allows to sort columns 5:10 numerically
-db.bioch.4p.clean[,5:10] <- sapply(5:10, function(i){
-  as.numeric(as.vector(db.bioch.4p.clean[,i]))
+db.bioch.all.clean[,5:10] <- sapply(5:10, function(i){
+  as.numeric(as.vector(db.bioch.all.clean[,i]))
 })
+
+# 4 plants accessions w/o missing values
+## count plants by accession
+p4 <- db.bioch.all.clean %>%
+  count(AV, sort = TRUE) %>%
+  filter(n == 4) %>%
+  select(AV)
+ 
+# db.bioch.4p.clean <- db.bioch.all.clean %>%
+#   filter(AV %in% p4$AV)
+
+# 4 plants accessions summary
+Q1 <- function(x){
+  quantile(x)[2]
+}
+
+Q3 <- function(x){
+  quantile(x)[4]
+}
+
+db.bioch.4p.summary <- db.bioch.4p.clean %>%
+  select(AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+  group_by(AV) %>%
+  summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
+  
+# choices in mucilbiochcols select box
+choices_mucilbiochcols <- list(
+  "Galacturonic Acid" = 'Gal_A',
+  "Neutral oses" = 'OsesNeutres',
+  "Molecular weight" = 'MW',
+  "Intrinsic viscosity" = 'IV',
+  "Giration radius" = 'RG',
+  "Hydrodynamic radius" = 'RH'
+  )
