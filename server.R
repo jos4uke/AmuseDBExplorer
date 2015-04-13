@@ -369,6 +369,12 @@ shinyServer(function(input, output, session) {
         )
     }
     
+    #### filter latitude range ###########################################
+    geoclimato <- geoclimato %>%
+      filter(
+        LATITUDE >= input$lat_range[1] & LATITUDE <= input$lat_range[2]
+      )
+
     # return at last
     geoclimato
   },

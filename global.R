@@ -116,6 +116,11 @@ db.climate.geoloc[6:7] <- sapply(6:7, function(i){
   as.numeric(as.vector(db.climate.geoloc[,i]))
 })
 
+### gps cooridnates: LATITUDE/LONGITUDE
+min_lat <- min(db.climate.geoloc$LATITUDE, na.rm=TRUE)-0.5
+max_lat <- max(db.climate.geoloc$LATITUDE, na.rm=TRUE)+0.5
+
+
 # choices climatodatasets select box
 choices_climatodatasets <- list(
   "MONTHLY HOURS OF SUNSHINE" = 'mhs',

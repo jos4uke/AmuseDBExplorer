@@ -235,8 +235,20 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                           Mutliple choice is allowed.")
           )
         ),
+        #### gps coordinates filtering
+        fluidRow(
+          tags$br(),
+          tags$div("Sliders allow you to filter dataset on the values range."),
+          tags$br(),
+          column(4,
+                 wellPanel(
+                   #### Latitude slider ###########################################
+                     sliderInput("lat_range", strong("Latitude range:"),
+                                 min = min_lat, max = max_lat, value = c(min_lat, max_lat))
+                   )
+                 )
+          ),
         tags$hr(),
-        tags$br(),
         tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
         tags$pre("Legend: 
   - 'MONTHLY HOURS OF SUNSHINE' = 'mhs',
