@@ -73,10 +73,10 @@ shinyServer(function(input, output, session) {
   output$dynamic_ozn_mean_slider <- renderUI({
     if (!"OsesNeutres" %in% input$show_mucilbiochsummarycols)
       return()
-    min_ozn_mean <- min(db.bioch.4p.summary$OsesNeutres_mean)
-    max_ozn_mean <- max(db.bioch.4p.summary$OsesNeutres_mean)
+    min_ozn_mean <- min(db.bioch.4p.summary$OsesNeutres_mean)-0.5
+    max_ozn_mean <- max(db.bioch.4p.summary$OsesNeutres_mean)+0.5
     sliderInput("ozn_mean_range", strong("OsesNeutres mean range:"),
-                min = min_ozn_mean, max = max_ozn_mean, value = c(min_ozn_mean, max_ozn_mean), round=FALSE)
+                min = min_ozn_mean, max = max_ozn_mean, value = c(min_ozn_mean, max_ozn_mean))
   })
   
   #### Molecular weight range slider ###########################################
