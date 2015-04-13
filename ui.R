@@ -246,7 +246,14 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                      sliderInput("lat_range", strong("Latitude range:"),
                                  min = min_lat, max = max_lat, value = c(min_lat, max_lat))
                    )
+                 ),
+          column(4,
+                 wellPanel(
+                   #### Longitude slider ###########################################
+                   sliderInput("long_range", strong("Longitude range:"),
+                               min = min_long, max = max_long, value = c(min_long, max_long))
                  )
+          )
           ),
         tags$hr(),
         tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
