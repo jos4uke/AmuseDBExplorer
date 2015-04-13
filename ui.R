@@ -92,7 +92,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           column(4,
             tags$br(),
             tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
-                              Mutliple choice is allowed.")
+                              Multiple choice is allowed.")
           )
           ),
         fluidRow(
@@ -162,7 +162,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           column(4,
                  tags$br(),
                  tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
-                          Mutliple choice is allowed.")
+                          Multiple choice is allowed.")
                  )
           ),
         fluidRow(
@@ -232,7 +232,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           column(4,
                  tags$br(),
                  tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
-                          Mutliple choice is allowed.")
+                          Multiple choice is allowed.")
           )
         ),
         #### gps coordinates filtering
