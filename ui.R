@@ -51,8 +51,20 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
     fluidPage(
       title="Search mucilage dataset",
       headerPanel("Search mucilage dataset"),
+      tags$br(),
+      tags$div("Raw and summary datasets are available."),
+      tags$br(),
+      ### dataset #########################################
+      fluidRow(
+        column(4,
+           selectInput("dataset", label = strong("Select dataset"), 
+                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary"), 
+                       selected = list("Raw dataset" = "raw"))
+               )
+        ),
       ### constant #########################################
       fluidRow(
+        tags$br(),
         column(4,
           tags$strong("Filter accessions by AV number"),
           tags$br(),
@@ -127,7 +139,12 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
               uiOutput("dynamic_rh_slider")
               )
             )
-          )
+          ),
+        tags$hr(),
+        tags$br(),
+        tags$div("Raw tab view provides mucilage dataset raw values: each table entry is related to one accession, one culture, one seed pool and one repetition number."),
+        tags$br(),
+        dataTableOutput("raw")
         ),
       
       ### mean  #########################################
@@ -163,14 +180,12 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
               uiOutput("dynamic_gala_mean_slider")
               )
             )
-          )
-        ),
-      tags$hr(),        
-      ## tabsets #########################################
-      tabsetPanel(
-        id="dataset",
-        tabPanel('raw', dataTableOutput("raw")),
-        tabPanel('summary', dataTableOutput("summary"))
+          ),
+        tags$hr(),
+        tags$br(),
+        tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession: _min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset. Only accessions with 4 plants are considered in the summary statistics."),
+        tags$br(),
+        dataTableOutput("summary")
         )
       )
     )
