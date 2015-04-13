@@ -190,8 +190,13 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
             conditionalPanel(
              'input.show_mucilbiochsummarycols.indexOf("MW") >= 0',
              uiOutput("dynamic_mw_mean_slider")
+            ),
+            #### filtering Intrinsic viscosity mean dataset #########################################
+            conditionalPanel(
+              'input.show_mucilbiochsummarycols.indexOf("IV") >= 0',
+              uiOutput("dynamic_iv_mean_slider")
+              )
             )
-                 )
           ),
         tags$hr(),
         tags$br(),

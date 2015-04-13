@@ -109,6 +109,16 @@ shinyServer(function(input, output, session) {
                 min = min_iv, max = max_iv, value = c(min_iv, max_iv))
   })
   
+  #### Intrinsic viscosity mean range slider
+  output$dynamic_iv_mean_slider <- renderUI({
+    if (!"IV" %in% input$show_mucilbiochsummarycols)
+      return()
+    min_iv_mean <- min(db.bioch.4p.summary$IV_mean)-0.5
+    max_iv_mean <- max(db.bioch.4p.summary$IV_mean)+0.5
+    sliderInput("iv_mean_range", strong("IV mean range:"),
+                min = min_iv_mean, max = max_iv_mean, value = c(min_iv_mean, max_iv_mean))
+  })
+  
   #### Giration radius range slider ###########################################
   output$dynamic_rg_slider <- renderUI({
     if (!"RG" %in% input$show_mucilbiochcols)
@@ -279,7 +289,15 @@ shinyServer(function(input, output, session) {
           MW_mean >= input$mw_mean_range[1] & MW_mean <= input$mw_mean_range[2]
         )
     }    
-       
+    
+    #### filter Intrinsic viscosity mean range ###########################################
+    if ("IV" %in% input$show_mucilbiochsummarycols) {
+      mucilbiochsummary <- mucilbiochsummary %>%
+        filter(
+          IV_mean >= input$iv_mean_range[1] & IV_mean <= input$iv_mean_range[2]
+        )
+    }
+    
     # return at last
     mucilbiochsummary
   },
