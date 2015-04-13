@@ -84,3 +84,41 @@ choices_mucilbiochcols <- list(
   "Giration radius" = 'RG',
   "Hydrodynamic radius" = 'RH'
   )
+
+## geo climato data
+db.climate.df <- read.table(file="data/AMUSE_accession_climate_clean_data.tab", header=TRUE, sep="\t", quote ="")
+db.clmate.all <- tbl_df(db.climate.df)
+# rename does not work!
+# dplyr::rename_(db.climate.all, .dots=setNames(list("name"),"NAME"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("av"), "AV"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("city"), "CITY"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("country"), "COUNTRY"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("alt"), "ALTITUDE"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("gps_lat"), "LATITUDE"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("gps_long"), "LONGITUDE"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("geo_qual"), "GEOLOC_QUAL"))
+
+db.climate.geoloc <- db.climate.all %>%
+  select(
+    NAME = name, 
+    AV = av,	
+    CITY = city,	
+    COUNTRY = country,	
+    ALTITUDE = alt,	
+    LATITUDE = gps_lat,	
+    LONGITUDE = gps_long,	
+    GEOLOC_QUAL = geo_qual
+    )
+
+db.climate.geoloc[6:7] <- sapply(6:7, function(i){
+  as.numeric(as.vector(db.climate.geoloc[,i]))
+})
+
+# choices climatodatasets select box
+choices_climatodatasets <- list(
+  "MONTHLY HOURS OF SUNSHINE" = 'mhs',
+  "MONTHLY PRECIPITATION" = 'mp',
+  "MEAN MONTHLY NUMBER OF RAIN DAYS" = 'mmnrd',
+  "MEAN MONTHLY TEMPERATURE" = 'mmt',
+  "MEAN MONTHLY TEMP RANGE" = 'mmtr'
+)

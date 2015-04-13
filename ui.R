@@ -58,7 +58,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       fluidRow(
         column(4,
            selectInput("dataset", label = strong("Select dataset"), 
-                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary"), 
+                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary", "Geo-climato dataset" = "geoclimato"), 
                        selected = list("Raw dataset" = "raw"))
                )
         ),
@@ -147,7 +147,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         dataTableOutput("raw")
         ),
       
-      ### mean  #########################################
+      ### summary  #########################################
       conditionalPanel(
         'input.dataset === "summary"',
         #### mucilage biochemical datasets
@@ -215,6 +215,38 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession: _min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset. Only accessions with 4 plants are considered in the summary statistics."),
         tags$br(),
         dataTableOutput("summary")
+        ),
+      
+      ### geoclimato  #########################################
+      conditionalPanel(
+        'input.dataset === "geoclimato"',
+        #### geoclimato datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+                 selectizeInput("show_climatodatasets", label = strong("Select climate datasets"), 
+                                choices = choices_climatodatasets, 
+                                selected = choices_climatodatasets,
+                                multiple = TRUE)
+          ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
+                          Mutliple choice is allowed.")
+          )
+        ),
+        tags$hr(),
+        tags$br(),
+        tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
+        tags$pre("Legend: 
+  - 'MONTHLY HOURS OF SUNSHINE' = 'mhs',
+  - 'MONTHLY PRECIPITATION' = 'mp',
+  - 'MEAN MONTHLY NUMBER OF RAIN DAYS' = 'mmnrd',
+  - 'MEAN MONTHLY TEMPERATURE' = 'mmt',
+  - 'MEAN MONTHLY TEMP RANGE' = 'mmtr'"),
+        tags$br(),
+        dataTableOutput("geoclimato")
+        
         )
       )
     )

@@ -340,4 +340,39 @@ shinyServer(function(input, output, session) {
   options = list(orderClasses = TRUE)
   )
 
+  ### geoclimato ###########################################
+
+  output$geoclimato <- renderDataTable({
+    
+    mandatory_geoloccols <- 1:8
+    
+    #### filter accessions by AV number ###########################################
+    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+      avs <- db.climate.geoloc$AV
+    } else {
+      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
+    }
+        
+    #### append climate datasets ###########################################
+    if (!is.null(input$show_climatodatasets)) {
+      show_cols_idx <- unlist(vapply(input$show_climatodatasets, function(c){
+        grep(pattern=paste(c,"_",sep=""), x=names(db.climate.all))
+      },FUN.VALUE=c(Jan=0, Feb=0, Mar=0, Apr=0, May=0, Jun=0, Jul=0, Aug=0, Sep=0, Oct=0, Nov=0, Dec=0)))
+      geoclimato <- db.climate.all %>%
+        filter(av %in% avs) %>%
+        select(one_of(names(db.climate.all)[c(mandatory_geoloccols, show_cols_idx)]))
+    #### only filter by accession on geoloc dataset
+    } else {
+      geoclimato <- db.climate.geoloc %>%
+        filter(
+          AV %in% avs
+        )
+    }
+    
+    # return at last
+    geoclimato
+  },
+  options = list(orderClasses = TRUE)
+  )
+
 })
