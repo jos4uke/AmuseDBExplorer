@@ -86,8 +86,9 @@ choices_mucilbiochcols <- list(
   )
 
 ## geo climato data
-db.climate.df <- read.table(file="data/AMUSE_accession_climate_clean_data.tab", header=TRUE, sep="\t", quote ="")
-db.clmate.all <- tbl_df(db.climate.df)
+db.climate.all <- read.table(file="data/AMUSE_accession_climate_clean_data.tab", header=TRUE, sep="\t", quote ="")
+# tbl_df seems not working on vega though same dplyr version 
+# db.clmate.all <- tbl_df(db.climate.df)
 # rename does not work!
 # dplyr::rename_(db.climate.all, .dots=setNames(list("name"),"NAME"))
 # dplyr::rename_(db.climate.all, .dots=setNames(list("av"), "AV"))
