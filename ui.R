@@ -38,7 +38,22 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                                                             "MapQuestOSM" = "http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", # works!
                                                             "MapQuestOpen.Aerial"= "http://oatile3.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg"), # works!
                               selected = c("http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg")) # default: MapQuestOSM
-    )       
+    ),
+    
+    # Shiny versions prior to 0.11 should use class="modal" instead.
+    absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                  draggable = TRUE, top = 150, left = "auto", right = 25, bottom = "auto",
+                  width = 330, height = "auto",
+                  
+                  h1("AmuseDB explorer"),
+                  
+                  textInput(inputId = "select_av_map", label = strong("Filter accessions by AV number"), value = "All")
+    ),
+    
+    # cite
+    tags$div(id="cite",
+             strong('Data compiled for ', tags$em('ANR AMUSE project 2009-2012 (Helen North, IJPB)'), ' by Joseph Tran (IJPB).')
+    )
   ),
   
 #   tabPanel("Bioch data explorer (all plants)",
@@ -47,10 +62,10 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
 #     )
 #   ),
   
-  tabPanel("Mucilage biochemical dataset",
+  tabPanel("Search arabidopsis mucilage dataset",
     fluidPage(
-      title="Search mucilage dataset",
-      headerPanel("Search mucilage dataset"),
+      title="Search arabidopsis mucilage dataset",
+      headerPanel("Search arabidopsis mucilage dataset"),
       tags$br(),
       tags$div("Raw, summary and geoloc climate datasets are available."),
       tags$br(),
@@ -62,13 +77,25 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                        selected = list("Raw dataset" = "raw"))
                )
         ),
+      ### description #########################################
+      conditionalPanel(
+        'input.dataset === "raw"',
+        tags$div("Raw tab view provides mucilage dataset raw values: each table entry is related to one accession, one culture, one seed pool and one repetition number.")
+      ),
+      conditionalPanel(
+        'input.dataset === "summary"',
+        tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession. Important: note that only accessions with 4 plants are considered in the summary statistics.")
+      ),
+      conditionalPanel(
+        'input.dataset === "geoclimato"',
+        tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
+        tags$a(href="https://www.pik-potsdam.de/members/cramer/climate", "(Cramer&Leemans database, version 2.1)")
+      ),  
       ### constant #########################################
       fluidRow(
         tags$br(),
         column(4,
-          tags$strong("Filter accessions by AV number"),
-          tags$br(),
-          tags$textarea(id="select_av", rows=5, cols=40, "All")
+          textInput(inputId = "select_av", label = strong("Filter accessions by AV number"), value = "All")
           ),
         column(4,
         tags$br(),
@@ -142,7 +169,6 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           ),
         tags$hr(),
         tags$h2("Results"),
-        tags$div("Raw tab view provides mucilage dataset raw values: each table entry is related to one accession, one culture, one seed pool and one repetition number."),
         wellPanel(
           tags$div("Download the filtered raw dataset results in csv format in zipped archive."),
           downloadButton('downloadRawData', 'Download zip file')
@@ -215,13 +241,14 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                  )
           ),
         tags$hr(),
-        tags$br(),
-        tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession: _min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset. Only accessions with 4 plants are considered in the summary statistics."),
+        tags$h2("Results"),
         wellPanel(
           tags$div("Download the filtered summary dataset results in csv format in zipped archive."),
           downloadButton('downloadSummaryData', 'Download zip file')
         ),
         tags$br(),
+        tags$p(strong("Help:")),
+        helpText('_min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset.'),
         dataTableOutput("summary")
         ),
       
@@ -264,8 +291,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           )
           ),
         tags$hr(),
-        tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
-        tags$a(href="https://www.pik-potsdam.de/members/cramer/climate", "(Cramer&Leemans database, version 2.1)"),
+        tags$h2("Results"),
         tags$pre("Legend: 
   - 'MONTHLY HOURS OF SUNSHINE' = 'mhs',
   - 'MONTHLY PRECIPITATION' = 'mp',

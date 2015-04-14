@@ -8,12 +8,46 @@
 suppressPackageStartupMessages(library(shiny))
 suppressPackageStartupMessages(library(leaflet))
 
+# FUNCTIONS
+split_string <- function(string) {
+  unlist(strsplit(string, split="[\\s\\n]+", perl=TRUE))
+}
+
+
+# SERVER
 shinyServer(function(input, output, session) {
 
   ## Interactive Map ###########################################
   
-  # Create the map
+  ### input accessions AV numbers ###########################################
+  input_avs_map <- reactive({
+    y <- input$select_av_map
+    
+    if ( y == "All" ||  y == "" || is.null(y) || is.na(y) ) {
+      return("All")
+    }
+    
+    as.numeric(split_string(y))
+  })
+  
+  observe({
+    y <- input$select_av
+    if ( !( y == "All" ||  y == "" || is.null(y) || is.na(y) ) ) {
+      updateTextInput(session, "select_av_map", value = y)
+    }
+  })
+  
+  output$search_avs_map <- renderText({
+    y <- input_avs_map()
+    if ( y == "All" ||  y == "" || is.null(y) || is.na(y) ) {
+      return()
+    }
+    return(y)
+  })
+    
+  ### Create the map 
   map <- createLeafletMap(session, "map")
+  
   output$mapp <- renderUI({
     input$mapPick
     isolate({
@@ -23,9 +57,11 @@ shinyServer(function(input, output, session) {
                  options=list(center = center(),zoom = zoom()))
     })
   })
+  
   zoom <- reactive({
     ifelse(is.null(input$map_zoom),3,input$map_zoom)
   })
+  
   center <- reactive({
     if(is.null(input$map_bounds)) {
       c(45, 5)
@@ -36,6 +72,32 @@ shinyServer(function(input, output, session) {
   })
   
   ## Mucilage bioch data Explorer ###########################################
+  
+  ### input accessions AV numbers ###########################################
+  input_avs <- reactive({
+    x <- input$select_av
+
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
+      return("All")
+    }
+
+    as.numeric(split_string(x))
+  })
+  
+  observe({
+    x <- input$select_av_map
+    if ( !( x == "All" ||  x == "" || is.null(x) || is.na(x) ) )  {
+      updateTextInput(session, "select_av", value = x)
+    }
+  })
+  
+  output$search_avs <- renderText({
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
+      return()
+    }
+    return(x)
+  })
   
   ### dynamic sliders ###########################################
   
@@ -182,10 +244,11 @@ shinyServer(function(input, output, session) {
 
   datasetRaw <- reactive({
     #### filter accessions by AV number ###########################################
-    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
       avs <- unique(db.bioch.all.clean$AV)
     } else {
-      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
+      avs <- x
     }
     mucilbioch <- db.bioch.all.clean %>%
       filter(
@@ -314,10 +377,11 @@ shinyServer(function(input, output, session) {
     mandatory_mucilbiochsummarycols <- 1
     
     #### filter accessions by AV number ###########################################
-    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
       avs <- p4$AV
     } else {
-      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
+      avs <- x
     }
     mucilbiochsummary <- db.bioch.4p.summary %>%
       filter(
@@ -448,10 +512,11 @@ shinyServer(function(input, output, session) {
     mandatory_geoloccols <- 1:8
     
     #### filter accessions by AV number ###########################################
-    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
       avs <- db.climate.geoloc$AV
     } else {
-      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
+      avs <- x
     }
     
     #### append climate datasets ###########################################
