@@ -347,10 +347,11 @@ shinyServer(function(input, output, session) {
     mandatory_mucilbiochsummarycols <- 1
     
     #### filter accessions by AV number ###########################################
-    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
       avs <- p4$AV
     } else {
-      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
+      avs <- x
     }
     mucilbiochsummary <- db.bioch.4p.summary %>%
       filter(
