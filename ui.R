@@ -217,6 +217,10 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         tags$hr(),
         tags$br(),
         tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession: _min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset. Only accessions with 4 plants are considered in the summary statistics."),
+        wellPanel(
+          tags$div("Download the filtered summary dataset results in csv format in zipped archive."),
+          downloadButton('downloadSummaryData', 'Download zip file')
+        ),
         tags$br(),
         dataTableOutput("summary")
         ),

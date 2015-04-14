@@ -310,8 +310,7 @@ shinyServer(function(input, output, session) {
 
   ### summary ###########################################
 
-  output$summary <- renderDataTable({
-    
+  datasetSummary <- reactive({
     mandatory_mucilbiochsummarycols <- 1
     
     #### filter accessions by AV number ###########################################
@@ -330,7 +329,7 @@ shinyServer(function(input, output, session) {
       grep(pattern=d, x=names(mucilbiochsummary))
     },FUN.VALUE=c(Min.=0, Q1=0, Median=0, Mean=0, Q3=0, Max.=0, IQR=0, sd=0)))
     mucilbiochsummary <- mucilbiochsummary[, c(mandatory_mucilbiochsummarycols, show_cols_idx), drop=FALSE]
-
+    
     #### filter Gal_A range ###########################################
     if ("Gal_A" %in% input$show_mucilbiochsummarycols) {
       # %>% function is bugged, generating:
@@ -345,7 +344,7 @@ shinyServer(function(input, output, session) {
       ## this classical one works
       mucilbiochsummary <- mucilbiochsummary[which(mucilbiochsummary$Gal_A_mean >= input$gala_mean_range[1] & mucilbiochsummary$Gal_A_mean <= input$gala_mean_range[2]), 1:ncol(mucilbiochsummary), drop=FALSE]      
     }
-
+    
     #### filter OsesNeutres mean range ###########################################
     if ("OsesNeutres" %in% input$show_mucilbiochsummarycols) {
       mucilbiochsummary <- mucilbiochsummary %>%
@@ -369,7 +368,7 @@ shinyServer(function(input, output, session) {
           IV_mean >= input$iv_mean_range[1] & IV_mean <= input$iv_mean_range[2]
         )
     }
-
+    
     #### filter Giration radius range ###########################################
     if ("RG" %in% input$show_mucilbiochsummarycols) {
       mucilbiochsummary <- mucilbiochsummary %>%
@@ -377,7 +376,7 @@ shinyServer(function(input, output, session) {
           RG_mean >= input$rg_mean_range[1] & RG_mean <= input$rg_mean_range[2]
         )
     }
-
+    
     #### filter Hydrodynamic radius mean range ###########################################
     if ("RH" %in% input$show_mucilbiochsummarycols) {
       mucilbiochsummary <- mucilbiochsummary %>%
@@ -388,8 +387,59 @@ shinyServer(function(input, output, session) {
     
     # return at last
     mucilbiochsummary
+  })
+
+  output$summary <- renderDataTable({
+    datasetSummary()
   },
   options = list(orderClasses = TRUE)
+  )
+
+  output$downloadSummaryData <- downloadHandler(
+    filename = function() { 
+      paste('AMUSE_summary_dataset_', format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss"), '.zip', sep='') 
+    },
+    content = function(file) {
+      print(file)
+      setwd(tempdir())
+      df <- datasetSummary()
+      saveTime <- format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss")
+      baseFile <- paste('AMUSE_summary_dataset_', saveTime, sep='')
+      # process csv file
+      csvFile <- paste(baseFile, '.csv', sep='')
+      write.csv2(df, csvFile, row.names=FALSE)
+      print(csvFile)
+      
+      # process metadata file
+      metadataFile <- paste(baseFile, '_metadata.txt', sep='')
+      sink(metadataFile)
+      cat(paste("Dataset File: ", csvFile, "\n",sep=''))
+      cat(paste("Metadata File: ", metadataFile, "\n",sep=''))
+      cat(paste("Date: ", saveTime, "\n",sep=''))
+      cat("AMUSE summary Dataset\n")
+      cat("DataTable dimensions: ")
+      cat(dim(df), "\n")
+      cat("Filters:\n")
+      cat(paste("#AV numbers: ", length(unique(df$AV)), "\n", sep=''))
+      if ("Gal_A" %in% input$show_mucilbiochsummarycols) 
+        cat(paste("#Gal_A mean range: ", input$gala_mean_range[1], ':', input$gala_mean_range[2], "\n", sep=''))
+      if ("OsesNeutres" %in% input$show_mucilbiochsummarycols)
+        cat(paste("#OsesNeutres mean range: ", input$ozn_mean_range[1], ":", input$ozn_mean_range[2], "\n", sep=''))      
+      if ("MW" %in% input$show_mucilbiochsummarycols)
+        cat(paste("#MW mean range: ", input$mw_mean_range[1], ":", input$mw_mean_range[2], "\n", sep=''))
+      if ("IV" %in% input$show_mucilbiochsummarycols)
+        cat(paste("#IV mean range: ", input$iv_mean_range[1], ":", input$iv_mean_range[2], "\n", sep=''))
+      if ("RG" %in% input$show_mucilbiochsummarycols)
+        cat(paste("#RG mean range: ", input$rg_mean_range[1], ":", input$rg_mean_range[2], "\n", sep=''))
+      if ("RH" %in% input$show_mucilbiochsummarycols)
+        cat(paste("#RH mean range: ", input$rh_mean_range[1], ":", input$rh_mean_range[2], "\n", sep=''))
+      cat("Contact: Joseph.Tran@versailles.inra.fr\n")
+      sink()
+      
+      # zip
+      zip(zipfile=file, files=c(csvFile, metadataFile))
+    },
+    contentType = "application/zip"
   )
 
   ### geoclimato ###########################################
