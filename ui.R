@@ -69,7 +69,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       ),
       conditionalPanel(
         'input.dataset === "summary"',
-        tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession: _min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset. Only accessions with 4 plants are considered in the summary statistics.")
+        tags$div("Summary tab view provides descriptive statistics on mucilage dataset by accession. Important: note that only accessions with 4 plants are considered in the summary statistics.")
       ),
       conditionalPanel(
         'input.dataset === "geoclimato"',
@@ -232,6 +232,8 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           downloadButton('downloadSummaryData', 'Download zip file')
         ),
         tags$br(),
+        tags$p(strong("Help:")),
+        helpText('_min, _Q1, _median, _mean, _Q3, _max, _IQR, _sd suffixes give respectively minimum, first quartile, median, mean, third quartile, maximum, interquartile range and standard deviation values for each dataset.'),
         dataTableOutput("summary")
         ),
       
