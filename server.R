@@ -8,6 +8,12 @@
 suppressPackageStartupMessages(library(shiny))
 suppressPackageStartupMessages(library(leaflet))
 
+# FUNCTIONS
+split_string <- function(string) {
+  unlist(strsplit(string, split="[\\s\\n]+", perl=TRUE))
+}
+
+
 shinyServer(function(input, output, session) {
 
   ## Interactive Map ###########################################
@@ -36,6 +42,32 @@ shinyServer(function(input, output, session) {
   })
   
   ## Mucilage bioch data Explorer ###########################################
+  
+  ### input accessions AV numbers ###########################################
+  input_avs <- reactive({
+    x <- input$select_av
+
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
+      return("All")
+    }
+
+    as.numeric(split_string(x))
+  })
+  
+  observe({
+    x <- input$select_av_map
+    if ( !( x == "All" ||  x == "" || is.null(x) || is.na(x) ) )  {
+      updateTextInput(session, "select_av", value = x)
+    }
+  })
+  
+  output$search_avs <- renderText({
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
+      return()
+    }
+    return(x)
+  })
   
   ### dynamic sliders ###########################################
   
@@ -182,10 +214,11 @@ shinyServer(function(input, output, session) {
 
   datasetRaw <- reactive({
     #### filter accessions by AV number ###########################################
-    if ( input$select_av == "All" ||  input$select_av == "" || is.null(input$select_av) || is.na(input$select_av) ) {
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
       avs <- unique(db.bioch.all.clean$AV)
     } else {
-      avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
+      avs <- x
     }
     mucilbioch <- db.bioch.all.clean %>%
       filter(
