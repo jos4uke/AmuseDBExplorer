@@ -14,12 +14,40 @@ split_string <- function(string) {
 }
 
 
+# SERVER
 shinyServer(function(input, output, session) {
 
   ## Interactive Map ###########################################
   
-  # Create the map
+  ### input accessions AV numbers ###########################################
+  input_avs_map <- reactive({
+    y <- input$select_av_map
+    
+    if ( y == "All" ||  y == "" || is.null(y) || is.na(y) ) {
+      return("All")
+    }
+    
+    as.numeric(split_string(y))
+  })
+  
+  observe({
+    y <- input$select_av
+    if ( !( y == "All" ||  y == "" || is.null(y) || is.na(y) ) ) {
+      updateTextInput(session, "select_av_map", value = y)
+    }
+  })
+  
+  output$search_avs_map <- renderText({
+    y <- input_avs_map()
+    if ( y == "All" ||  y == "" || is.null(y) || is.na(y) ) {
+      return()
+    }
+    return(y)
+  })
+    
+  ### Create the map 
   map <- createLeafletMap(session, "map")
+  
   output$mapp <- renderUI({
     input$mapPick
     isolate({
@@ -29,9 +57,11 @@ shinyServer(function(input, output, session) {
                  options=list(center = center(),zoom = zoom()))
     })
   })
+  
   zoom <- reactive({
     ifelse(is.null(input$map_zoom),3,input$map_zoom)
   })
+  
   center <- reactive({
     if(is.null(input$map_bounds)) {
       c(45, 5)
