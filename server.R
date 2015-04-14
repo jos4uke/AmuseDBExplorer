@@ -273,7 +273,7 @@ shinyServer(function(input, output, session) {
       baseFile <- paste('AMUSE_raw_dataset_', saveTime, sep='')
       # process csv file
       csvFile <- paste(baseFile, '.csv', sep='')
-      write.csv(df, csvFile)
+      write.csv2(df, csvFile, row.names=FALSE)
       print(csvFile)
       
       # process metadata file
