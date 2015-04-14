@@ -444,8 +444,7 @@ shinyServer(function(input, output, session) {
 
   ### geoclimato ###########################################
 
-  output$geoclimato <- renderDataTable({
-    
+  datasetClimate <- reactive({
     mandatory_geoloccols <- 1:8
     
     #### filter accessions by AV number ###########################################
@@ -454,7 +453,7 @@ shinyServer(function(input, output, session) {
     } else {
       avs <- as.numeric(unlist(strsplit(input$select_av, split="[\\s\\n]+", perl=TRUE)))
     }
-        
+    
     #### append climate datasets ###########################################
     if (!is.null(input$show_climatodatasets)) {
       show_cols_idx <- unlist(vapply(input$show_climatodatasets, function(c){
@@ -463,7 +462,7 @@ shinyServer(function(input, output, session) {
       geoclimato <- db.climate.all %>%
         filter(AV %in% avs) %>%
         select(one_of(names(db.climate.all)[c(mandatory_geoloccols, show_cols_idx)]))
-    #### only filter by accession on geoloc dataset
+      #### only filter by accession on geoloc dataset
     } else {
       geoclimato <- db.climate.geoloc %>%
         filter(
@@ -477,11 +476,51 @@ shinyServer(function(input, output, session) {
         (LATITUDE >= input$lat_range[1] & LATITUDE <= input$lat_range[2]) | is.na(LATITUDE),
         (LONGITUDE >= input$long_range[1] & LONGITUDE <= input$long_range[2]) | is.na(LONGITUDE)
       ) 
-      
+    
     # return at last
     geoclimato
+  })
+
+  output$geoclimato <- renderDataTable({
+    datasetClimate()
   },
   options = list(orderClasses = TRUE)
   )
 
+  output$downloadClimateData <- downloadHandler(
+    filename = function() { 
+      paste('AMUSE_climate_dataset_', format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss"), '.zip', sep='') 
+    },
+    content = function(file) {
+      print(file)
+      setwd(tempdir())
+      df <- datasetClimate()
+      saveTime <- format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss")
+      baseFile <- paste('AMUSE_climate_dataset_', saveTime, sep='')
+      # process csv file
+      csvFile <- paste(baseFile, '.csv', sep='')
+      write.csv2(df, csvFile, row.names=FALSE)
+      print(csvFile)
+      
+      # process metadata file
+      metadataFile <- paste(baseFile, '_metadata.txt', sep='')
+      sink(metadataFile)
+      cat(paste("Dataset File: ", csvFile, "\n",sep=''))
+      cat(paste("Metadata File: ", metadataFile, "\n",sep=''))
+      cat(paste("Date: ", saveTime, "\n",sep=''))
+      cat("AMUSE climate Dataset\n")
+      cat("DataTable dimensions: ")
+      cat(dim(df), "\n")
+      cat("Filters:\n")
+      cat(paste("#AV numbers: ", length(unique(df$AV)), "\n", sep='')) 
+      cat(paste("#LATITUDE range: ", input$lat_range[1], ':', input$lat_range[2], "\n", sep=''))
+      cat(paste("#LONGITUDE range: ", input$long_range[1], ":", input$long_range[2], "\n", sep=''))      
+      cat("Contact: Joseph.Tran@versailles.inra.fr\n")
+      sink()
+      
+      # zip
+      zip(zipfile=file, files=c(csvFile, metadataFile))
+    },
+    contentType = "application/zip"
+  )
 })

@@ -265,12 +265,17 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           ),
         tags$hr(),
         tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
+        tags$a(href="https://www.pik-potsdam.de/members/cramer/climate", "(Cramer&Leemans database, version 2.1)"),
         tags$pre("Legend: 
   - 'MONTHLY HOURS OF SUNSHINE' = 'mhs',
   - 'MONTHLY PRECIPITATION' = 'mp',
   - 'MEAN MONTHLY NUMBER OF RAIN DAYS' = 'mmnrd',
   - 'MEAN MONTHLY TEMPERATURE' = 'mmt',
   - 'MEAN MONTHLY TEMP RANGE' = 'mmtr'"),
+        wellPanel(
+          tags$div("Download the filtered climate datasets results in csv format in zipped archive."),
+          downloadButton('downloadClimateData', 'Download zip file')
+        ),
         tags$br(),
         dataTableOutput("geoclimato")
         
