@@ -80,9 +80,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
       fluidRow(
         tags$br(),
         column(4,
-          tags$strong("Filter accessions by AV number"),
-          tags$br(),
-          tags$textarea(id="select_av", rows=5, cols=40, "All")
+          textInput(inputId = "select_av", label = strong("Filter accessions by AV number"), value = "All")
           ),
         column(4,
         tags$br(),
