@@ -54,7 +54,11 @@ shinyServer(function(input, output, session) {
       leafletMap("map", "100%", "100%",
                  initialTileLayer = input$mapPick,
                  initialTileLayerAttribution = HTML('© MapQuest, Map Data © OpenStreetMap contributors, ODbL'),
-                 options=list(center = center(),zoom = zoom()))
+                 options=list(
+                              center = center(),
+                              zoom = zoom(),
+                              maxBounds = list(list(-90, -180), list(90, 180))
+                              ))
     })
   })
   
