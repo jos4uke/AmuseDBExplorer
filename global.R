@@ -116,7 +116,7 @@ db.climate.geoloc[6:7] <- sapply(6:7, function(i){
   as.numeric(as.vector(db.climate.geoloc[,i]))
 })
 
-### gps cooridnates: LATITUDE/LONGITUDE
+### gps coordinates: LATITUDE/LONGITUDE
 min_lat <- min(db.climate.geoloc$LATITUDE, na.rm=TRUE)-0.5
 max_lat <- max(db.climate.geoloc$LATITUDE, na.rm=TRUE)+0.5
 min_long <- min(db.climate.geoloc$LONGITUDE, na.rm=TRUE)-0.5
