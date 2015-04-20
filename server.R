@@ -556,7 +556,8 @@ shinyServer(function(input, output, session) {
   ### summary ###########################################
 
   datasetSummary <- reactive({
-    mandatory_mucilbiochsummarycols <- 1
+    # TODO: add NAME and culture
+    mandatory_mucilbiochsummarycols <- 1:2
     
     #### filter accessions by AV number ###########################################
     x <- input_avs()

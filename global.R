@@ -97,6 +97,10 @@ db.bioch.all.clean[,5:10] <- sapply(5:10, function(i){
   as.numeric(as.vector(db.bioch.all.clean[,i]))
 })
 
+# update raw dataset
+## add name
+db.bioch.all.clean <- dplyr::left_join(db.bioch.all.clean, db.climate.geoloc[,c("AV", "NAME")], by = "AV")
+
 # 4 plants accessions w/o missing values
 ## count plants by accession
 p4 <- db.bioch.all.clean %>%
