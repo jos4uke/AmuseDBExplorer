@@ -198,49 +198,75 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                  )
           ),
         fluidRow(
+          tags$br(),
+          column(4,
+                 checkboxInput("groupByCulture", label = strong("group by culture"), value = FALSE)
+                 ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, summary dataset is grouped by accession AV number/NAME. Checking the 'group by culture' will summary the dataset by accession AV number/NAME and culture.")
+                 )
+          ),
+        fluidRow(
+          tags$br(),
+          column(4,
+                 selectizeInput("show_summarycols", label = strong("Summary dataset columns"), 
+                                choices = choices_summarycols, 
+                                selected = choices_summarycols[c(4,8)],
+                                multiple = TRUE)
+          ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, only mean and standard deviation columns are selected. You can add additional or remove available summary columns from the drop-down menu. 
+                          Multiple choice is allowed.")
+          )
+        ),
+        fluidRow(
           column(5,
                  tags$br(),
                  tags$div("Sliders allow you to filter dataset on the values range."),
                  tags$br()
           )
         ),
-        fluidRow(
-          column(4,
-            #### filering Gal_A mean dataset #########################################
-            conditionalPanel(
-              'input.show_mucilbiochsummarycols.indexOf("Gal_A") >= 0',
-              uiOutput("dynamic_gala_mean_slider")
-              ),
-            #### filtering Neutral oses mean dataset #########################################
-            conditionalPanel(
-              'input.show_mucilbiochsummarycols.indexOf("OsesNeutres") >= 0',
-              uiOutput("dynamic_ozn_mean_slider")
-            )
-            ),
-          column(4,
-            #### filtering Molecular weight mean dataset #########################################
-            conditionalPanel(
-             'input.show_mucilbiochsummarycols.indexOf("MW") >= 0',
-             uiOutput("dynamic_mw_mean_slider")
-            ),
-            #### filtering Intrinsic viscosity mean dataset #########################################
-            conditionalPanel(
-              'input.show_mucilbiochsummarycols.indexOf("IV") >= 0',
-              uiOutput("dynamic_iv_mean_slider")
+        conditionalPanel('input.show_summarycols.indexOf("_mean") >= 0',
+          fluidRow(    
+            column(4,
+              #### filering Gal_A mean dataset #########################################
+              conditionalPanel(
+                'input.show_mucilbiochsummarycols.indexOf("Gal_A") >= 0',
+                uiOutput("dynamic_gala_mean_slider")
+                ),
+              #### filtering Neutral oses mean dataset #########################################
+              conditionalPanel(
+                'input.show_mucilbiochsummarycols.indexOf("OsesNeutres") >= 0',
+                uiOutput("dynamic_ozn_mean_slider")
               )
-            ),
-          column(4,
-            #### filtering Giration radius mean dataset #########################################
-            conditionalPanel(
-             'input.show_mucilbiochsummarycols.indexOf("RG") >= 0',
-             uiOutput("dynamic_rg_mean_slider")
-            ),
-            #### filtering Hydrodynamic radius mean dataset #########################################
-            conditionalPanel(
-              'input.show_mucilbiochsummarycols.indexOf("RH") >= 0',
-              uiOutput("dynamic_rh_mean_slider")
-            )     
-                 )
+              ),
+            column(4,
+              #### filtering Molecular weight mean dataset #########################################
+              conditionalPanel(
+               'input.show_mucilbiochsummarycols.indexOf("MW") >= 0',
+               uiOutput("dynamic_mw_mean_slider")
+              ),
+              #### filtering Intrinsic viscosity mean dataset #########################################
+              conditionalPanel(
+                'input.show_mucilbiochsummarycols.indexOf("IV") >= 0',
+                uiOutput("dynamic_iv_mean_slider")
+                )
+              ),
+            column(4,
+              #### filtering Giration radius mean dataset #########################################
+              conditionalPanel(
+               'input.show_mucilbiochsummarycols.indexOf("RG") >= 0',
+               uiOutput("dynamic_rg_mean_slider")
+              ),
+              #### filtering Hydrodynamic radius mean dataset #########################################
+              conditionalPanel(
+                'input.show_mucilbiochsummarycols.indexOf("RH") >= 0',
+                uiOutput("dynamic_rh_mean_slider")
+              )     
+                   )
+            )
           ),
         tags$hr(),
         tags$h2("Results"),

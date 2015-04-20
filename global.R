@@ -1,6 +1,52 @@
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(RODBC))
 
+## geo climato data
+db.climate.all <- read.table(file="data/AMUSE_accession_climate_clean_data_UTF8.tab", header=TRUE, sep="\t", quote ="")
+# tbl_df seems not working on vega though same dplyr version 
+# db.clmate.all <- tbl_df(db.climate.df)
+# rename does not work!
+# dplyr::rename_(db.climate.all, .dots=setNames(list("name"),"NAME"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("av"), "AV"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("city"), "CITY"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("country"), "COUNTRY"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("alt"), "ALTITUDE"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("gps_lat"), "LATITUDE"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("gps_long"), "LONGITUDE"))
+# dplyr::rename_(db.climate.all, .dots=setNames(list("geo_qual"), "GEOLOC_QUAL"))
+
+names(db.climate.all)[1:8] <- c('NAME', 'AV', 'CITY', 'COUNTRY', 'ALTITUDE', 'LATITUDE', 'LONGITUDE', 'GEOLOC_QUAL')
+db.climate.geoloc <- db.climate.all %>%
+  select(
+    NAME, 
+    AV,  
+    CITY,	
+    COUNTRY,	
+    ALTITUDE,	
+    LATITUDE,	
+    LONGITUDE,
+    GEOLOC_QUAL
+  )
+
+db.climate.geoloc[6:7] <- sapply(6:7, function(i){
+  as.numeric(as.vector(db.climate.geoloc[,i]))
+})
+
+### gps coordinates: LATITUDE/LONGITUDE
+min_lat <- min(db.climate.geoloc$LATITUDE, na.rm=TRUE)-0.5
+max_lat <- max(db.climate.geoloc$LATITUDE, na.rm=TRUE)+0.5
+min_long <- min(db.climate.geoloc$LONGITUDE, na.rm=TRUE)-0.5
+max_long <- max(db.climate.geoloc$LONGITUDE, na.rm=TRUE)+0.5
+
+# choices climatodatasets select box
+choices_climatodatasets <- list(
+  "MONTHLY HOURS OF SUNSHINE" = 'mhs',
+  "MONTHLY PRECIPITATION" = 'mp',
+  "MEAN MONTHLY NUMBER OF RAIN DAYS" = 'mmnrd',
+  "MEAN MONTHLY TEMPERATURE" = 'mmt',
+  "MEAN MONTHLY TEMP RANGE" = 'mmtr'
+)
+
 # AmuseDB connection
 con <- odbcConnect("Amuse")
 
@@ -51,6 +97,10 @@ db.bioch.all.clean[,5:10] <- sapply(5:10, function(i){
   as.numeric(as.vector(db.bioch.all.clean[,i]))
 })
 
+# update raw dataset
+## add name
+db.bioch.all.clean <- dplyr::left_join(db.bioch.all.clean, db.climate.geoloc[,c("AV", "NAME")], by = "AV")
+
 # 4 plants accessions w/o missing values
 ## count plants by accession
 p4 <- db.bioch.all.clean %>%
@@ -70,9 +120,10 @@ Q3 <- function(x){
   quantile(x)[4]
 }
 
-db.bioch.4p.summary <- db.bioch.4p.clean %>%
-  select(AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
-  group_by(AV) %>%
+db.bioch.4p.summary <- db.bioch.all.clean %>%
+  filter(AV %in% p4$AV) %>%
+  select(NAME, AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+  group_by(NAME, AV) %>%
   summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
   
 # choices in mucilbiochcols select box
@@ -85,48 +136,15 @@ choices_mucilbiochcols <- list(
   "Hydrodynamic radius" = 'RH'
   )
 
-## geo climato data
-db.climate.all <- read.table(file="data/AMUSE_accession_climate_clean_data_UTF8.tab", header=TRUE, sep="\t", quote ="")
-# tbl_df seems not working on vega though same dplyr version 
-# db.clmate.all <- tbl_df(db.climate.df)
-# rename does not work!
-# dplyr::rename_(db.climate.all, .dots=setNames(list("name"),"NAME"))
-# dplyr::rename_(db.climate.all, .dots=setNames(list("av"), "AV"))
-# dplyr::rename_(db.climate.all, .dots=setNames(list("city"), "CITY"))
-# dplyr::rename_(db.climate.all, .dots=setNames(list("country"), "COUNTRY"))
-# dplyr::rename_(db.climate.all, .dots=setNames(list("alt"), "ALTITUDE"))
-# dplyr::rename_(db.climate.all, .dots=setNames(list("gps_lat"), "LATITUDE"))
-# dplyr::rename_(db.climate.all, .dots=setNames(list("gps_long"), "LONGITUDE"))
-# dplyr::rename_(db.climate.all, .dots=setNames(list("geo_qual"), "GEOLOC_QUAL"))
+# choices in summarycols select box
+choices_summarycols <- list(
+  "minimum" = "_min",
+  "first quartile (Q1)" = "_Q1",
+  "median" = "_median",
+  "mean" = "_mean",
+  "third quartile (Q3)" = "_Q3",
+  "maximum" = "_max",
+  "interquartile range (IQR)" = "_IQR",
+  "standard deviation"= "_sd"
+  )
 
-names(db.climate.all)[1:8] <- c('NAME', 'AV', 'CITY', 'COUNTRY', 'ALTITUDE', 'LATITUDE', 'LONGITUDE', 'GEOLOC_QUAL')
-db.climate.geoloc <- db.climate.all %>%
-  select(
-    NAME, 
-    AV,	
-    CITY,	
-    COUNTRY,	
-    ALTITUDE,	
-    LATITUDE,	
-    LONGITUDE,
-    GEOLOC_QUAL
-    )
-
-db.climate.geoloc[6:7] <- sapply(6:7, function(i){
-  as.numeric(as.vector(db.climate.geoloc[,i]))
-})
-
-### gps coordinates: LATITUDE/LONGITUDE
-min_lat <- min(db.climate.geoloc$LATITUDE, na.rm=TRUE)-0.5
-max_lat <- max(db.climate.geoloc$LATITUDE, na.rm=TRUE)+0.5
-min_long <- min(db.climate.geoloc$LONGITUDE, na.rm=TRUE)-0.5
-max_long <- max(db.climate.geoloc$LONGITUDE, na.rm=TRUE)+0.5
-
-# choices climatodatasets select box
-choices_climatodatasets <- list(
-  "MONTHLY HOURS OF SUNSHINE" = 'mhs',
-  "MONTHLY PRECIPITATION" = 'mp',
-  "MEAN MONTHLY NUMBER OF RAIN DAYS" = 'mmnrd',
-  "MEAN MONTHLY TEMPERATURE" = 'mmt',
-  "MEAN MONTHLY TEMP RANGE" = 'mmtr'
-)
