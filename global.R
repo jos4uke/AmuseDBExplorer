@@ -70,9 +70,10 @@ Q3 <- function(x){
   quantile(x)[4]
 }
 
-db.bioch.4p.summary <- db.bioch.4p.clean %>%
-  select(AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
-  group_by(AV) %>%
+db.bioch.4p.summary <- db.bioch.all.clean %>%
+  filter(AV %in% p4$AV) %>%
+  select(NAME, AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+  group_by(NAME, AV) %>%
   summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
   
 # choices in mucilbiochcols select box
