@@ -75,6 +75,157 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  ### Marks
+  
+  # A reactive expression that returns the set of accessions that are
+  # in bounds right now
+  accessionsInBounds <- reactive({
+    if (is.null(input$map_bounds))
+      return(db.climate.geoloc[FALSE,])
+    bounds <- input$map_bounds
+    latRng <- range(bounds$north, bounds$south)
+    lngRng <- range(bounds$east, bounds$west)
+    
+    subset(db.climate.geoloc,
+           LATITUDE >= latRng[1] & LATITUDE <= latRng[2] &
+             LONGITUDE >= lngRng[1] & LONGITUDE <= lngRng[2])
+  })
+  
+#   observe({
+#     map$clearMarkers()
+#     map$clearShapes()
+#     
+#     accessions <- accessionsInBounds()
+#     if (nrow(accessionsInBounds()) == 0)
+#       return()
+#     
+#     geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
+#     qual_colors <- c("green", "orange", "blue", "black")
+#     names(qual_colors) <- geoloc_qual
+#     colors <- qual_colors[db.climate.geoloc$GEOLOC_QUAL]
+#     acc_colors <- colors[match(accessions$AV, db.climate.geoloc$AV)]
+#     names(acc_colors) <- c() # reset names to get indexes back when add marks
+# 
+#     map$addCircleMarker(
+#       accessions$LATITUDE,
+#       accessions$LONGITUDE,
+#       rep(6, length(accessions)),
+#       accessions$AV,
+#       list(stroke=FALSE, fill=TRUE, fillOpacity=0.7),
+#       list(color=acc_colors)
+#     )
+#   })
+  
+  
+  # session$onFlushed is necessary to work around a bug in the Shiny/Leaflet
+  # integration; without it, the addCircle commands arrive in the browser
+  # before the map is created.
+  session$onFlushed(once=TRUE, function() {   
+    drawAccessions <- observe({
+      x <- input_avs_map()
+      
+      # TODO list:
+      # is x all the accessions?
+      ## yes: get accessions in bound and draw markers by geoloc_qual
+      ## no: 
+      ### get requested accessions coordinates and fits the new bounds: southwest=min(lat, lng)-sw_margins and northeast=max(lat, lng)+ne_margins
+      ### highlight the requested accessions in yellow circles for example
+      ### get accessions in bound in the new bounds and draw markers
+      
+      # Clear existing marks/circles/popups before drawing
+      map$clearMarkers()
+      map$clearShapes()
+      map$clearPopups()
+      
+      # Requested accessions
+      #if x !(All|""|NA|NULL) draw circles around markers
+      if ( !( x == "All" ||  x == "" || is.null(x) || is.na(x) ) ) {
+        # get accessions
+        req_acc <- db.climate.geoloc %>%
+          filter(
+            AV %in% x            
+            )
+        
+        # fitsbound
+        if ( length(req_acc) == 1 ) {
+          map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, zoom(), forceReset = FALSE)
+        } else {
+          sw_margin <- 5
+          ne_margin <- 5
+          sw <- list(lat1=min(req_acc$LATITUDE), lng1=min(req_acc$LONGITUDE))
+          ne <- list(lat2=max(req_acc$LATITUDE), lng2=max(req_acc$LONGITUDE))
+          # both methods prevent to zoom and browse the map
+          map$fitBounds(sw$lat1-sw_margin, sw$lng1-sw_margin, ne$lat2+ne_margin, ne$lng2+ne_margin)
+          # idem using setview: cannot zoom or browse map
+#           map$setView(mean(sw$lat1,ne$lat2), mean(sw$lng1,ne$lng2), zoom())
+        }
+      }
+      
+      # Accessions in bound
+      accessions <- accessionsInBounds()
+      if (nrow(accessionsInBounds()) == 0)
+        return()
+      
+      # Define colors
+      geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
+      qual_colors <- c("green", "orange", "blue", "grey")
+      names(qual_colors) <- geoloc_qual
+      colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
+      acc_colors <- colors[match(accessions$AV, db.climate.geoloc$AV)]
+      names(acc_colors) <- c() # reset names to get indexes back when add marks
+      
+#       map$addCircleMarker(
+#         accessions$LATITUDE,
+#         accessions$LONGITUDE,
+#         rep(6, length(accessions)),
+#         accessions$AV,
+#         list(stroke=FALSE, fill=TRUE, fillOpacity=0.7),
+#         list(color=acc_colors)
+#       )
+      
+      # Draw in batches of 100; makes the app feel a bit more responsive
+      chunksize <- 100
+      for (from in seq.int(1, nrow(accessions), chunksize)) {
+        to <- min(nrow(accessions), from + chunksize)
+        accchunk <- accessions[from:to,]
+        # Bug in Shiny causes this to error out when user closes browser
+        # before we get here
+        try(
+          map$addCircleMarker(
+            accchunk$LATITUDE,
+            accchunk$LONGITUDE,
+            rep(6, length(accchunk)),
+            accchunk$AV,
+            list(stroke=FALSE, fill=TRUE, fillOpacity=0.7, pointerEvents="mouseover"),
+            list(color=acc_colors[from:to])
+          )
+        )
+      }
+
+      # if requested accessions, delay drawing
+      if ( !( x == "All" ||  x == "" || is.null(x) || is.na(x) ) ) {
+        # highlight and popup
+        map$addMarker(
+          req_acc$LATITUDE, req_acc$LONGITUDE,
+          req_acc$AV,
+          list(riseOnHover=TRUE, fillOpacity=0.9),
+          list(title=req_acc$AV, alt=req_acc$NAME)
+        )
+        # cannot display multiple popups at the same time (see js bindings src) => uses mouse events to display
+#         lapply(req_acc, function(x) {
+#           acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s (%s)", x[2], x[1]))),tags$br()))
+#           map$showPopup(x[6], x[7], acc_content, layerId = x[2], options=list())
+#         })
+#         acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s %s", req_acc$AV, req_acc$NAME))),tags$br()))
+#         map$showPopup(req_acc$LATITUDE, req_acc$LONGITUDE, req_acc$AV, req_acc$AV, options=list(keepInView=TRUE))
+      }
+    
+    })
+
+    # TIL this is necessary in order to prevent the observer from
+    # attempting to write to the websocket after the session is gone.
+    session$onSessionEnded(drawAccessions$suspend)
+  })
   ## Mucilage bioch data Explorer ###########################################
   
   ### input accessions AV numbers ###########################################
