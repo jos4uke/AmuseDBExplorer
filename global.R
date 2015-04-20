@@ -136,5 +136,15 @@ choices_mucilbiochcols <- list(
   "Hydrodynamic radius" = 'RH'
   )
 
-
+# choices in summarycols select box
+choices_summarycols <- list(
+  "minimum" = "_min",
+  "first quartile (Q1)" = "_Q1",
+  "median" = "_median",
+  "mean" = "_mean",
+  "third quartile (Q3)" = "_Q3",
+  "maximum" = "_max",
+  "interquartile range (IQR)" = "_IQR",
+  "standard deviation"= "_sd"
+  )
 
