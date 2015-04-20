@@ -45,14 +45,16 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                   draggable = TRUE, top = 150, left = "auto", right = 25, bottom = "auto",
                   width = 330, height = "auto",
                   
-                  h1("AmuseDB explorer"),
+                  h3("Search arabidopsis accessions"),
+                  textInput(inputId = "select_av_map", label = strong("Fill in AV number(s)"), value = "All"),
                   
-                  textInput(inputId = "select_av_map", label = strong("Filter accessions by AV number"), value = "All")
+                  hr(),
+                  h4("Accession informations")
     ),
     
     # cite
     tags$div(id="cite",
-             strong('Data compiled for ', tags$em('ANR AMUSE project 2009-2012 (Helen North, IJPB)'), ' by Joseph Tran (IJPB).')
+             strong('Data compiled for ', tags$em('ANR AMUSE project 2009-2012 (Helen North, IJPB/INRA)'), ' by Joseph Tran (IJPB/INRA).')
     )
   ),
   
