@@ -556,8 +556,18 @@ shinyServer(function(input, output, session) {
   ### summary ###########################################
 
   datasetSummary <- reactive({
-    # TODO: add NAME and culture
     mandatory_mucilbiochsummarycols <- 1:2
+    
+    #### group by culture ###########################################
+    if (input$groupByCulture) {
+      db.bioch.4p.summary <- db.bioch.all.clean %>%
+        filter(AV %in% p4$AV) %>%
+        select(NAME, AV, Culture, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+        group_by(NAME, AV, Culture) %>%
+        summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
+      
+      mandatory_mucilbiochsummarycols <- 1:3
+    }
     
     #### filter accessions by AV number ###########################################
     x <- input_avs()
