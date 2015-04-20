@@ -226,6 +226,33 @@ shinyServer(function(input, output, session) {
     # attempting to write to the websocket after the session is gone.
     session$onSessionEnded(drawAccessions$suspend)
   })
+  
+  # Show a popup at the given location
+  showAccPopup <- function(acc, lat, lng) {
+    selectedAcc <- db.climate.geoloc[db.climate.geoloc$AV == acc,]
+    content <- as.character(tagList(
+      tags$strong(HTML(sprintf("AV %s (%s)",
+                               selectedAcc$AV, selectedAcc$NAME
+      ))), tags$br(),
+      sprintf("geoloc quality: %s", selectedAcc$GEOLOC_QUAL), tags$br()
+    ))
+    map$showPopup(lat, lng, content, acc)
+  }
+  
+  # When mark is mouseover, show popup with accession infos: AV number, name
+  mouseOverMark <- observe({
+    map$clearPopups()
+    event <- input$map_marker_mouseover
+    if (is.null(event))
+      return()
+    
+    isolate({
+      showAccPopup(event$id, event$lat, event$lng)
+    })
+  })
+
+  session$onSessionEnded(mouseOverMark$suspend)
+
   ## Mucilage bioch data Explorer ###########################################
   
   ### input accessions AV numbers ###########################################
