@@ -577,59 +577,73 @@ shinyServer(function(input, output, session) {
     },FUN.VALUE=c(Min.=0, Q1=0, Median=0, Mean=0, Q3=0, Max.=0, IQR=0, sd=0)))
     mucilbiochsummary <- mucilbiochsummary[, c(mandatory_mucilbiochsummarycols, show_cols_idx), drop=FALSE]
     
-    #### filter Gal_A range ###########################################
-    if ("Gal_A" %in% input$show_mucilbiochsummarycols) {
-      # %>% function is bugged, generating:
-      ## Error in eval(substitute(expr), envir, enclos) : 
-      ##      incorrect length (0), expecting: 1272
-      #      mucilbiochsummary <- mucilbiochsummary %>%
-      #        filter(
-      #          Gal_A_mean >= input$gala_mean_range[1] & Gal_A_mean <= input$gala_mean_range[2]
-      #        )
-      ## nor this syntax works
-      #      mucilbiochsummary <- filter(mucilbiochsummary, Gal_A_mean >= input$gala_mean_range[1] & Gal_A_mean <= input$gala_mean_range[2])
-      ## this classical one works
-      mucilbiochsummary <- mucilbiochsummary[which(mucilbiochsummary$Gal_A_mean >= input$gala_mean_range[1] & mucilbiochsummary$Gal_A_mean <= input$gala_mean_range[2]), 1:ncol(mucilbiochsummary), drop=FALSE]      
-    }
+    #### filter summary columns ###########################################
+    show_summary_cols_idx <- unlist(lapply(input$show_summarycols, function(c){
+      grep(pattern=c, x=names(mucilbiochsummary))
+    }))    
+    mucilbiochsummary <- mucilbiochsummary[, c(mandatory_mucilbiochsummarycols, show_summary_cols_idx), drop=FALSE]
+    ##### reorder by dataset
+    cols_by_dataset <- unlist(lapply(input$show_mucilbiochsummarycols, function(d){
+      grep(pattern=d, x=names(mucilbiochsummary))
+    }))
+    mucilbiochsummary <- mucilbiochsummary[, c(mandatory_mucilbiochsummarycols, cols_by_dataset), drop=FALSE]
     
-    #### filter OsesNeutres mean range ###########################################
-    if ("OsesNeutres" %in% input$show_mucilbiochsummarycols) {
-      mucilbiochsummary <- mucilbiochsummary %>%
-        filter(
-          OsesNeutres_mean >= input$ozn_mean_range[1] & OsesNeutres_mean <= input$ozn_mean_range[2]
-        )
-    }
-    
-    #### filter Molecular weight mean range ###########################################
-    if ("MW" %in% input$show_mucilbiochsummarycols) {
-      mucilbiochsummary <- mucilbiochsummary %>%
-        filter(
-          MW_mean >= input$mw_mean_range[1] & MW_mean <= input$mw_mean_range[2]
-        )
-    }    
-    
-    #### filter Intrinsic viscosity mean range ###########################################
-    if ("IV" %in% input$show_mucilbiochsummarycols) {
-      mucilbiochsummary <- mucilbiochsummary %>%
-        filter(
-          IV_mean >= input$iv_mean_range[1] & IV_mean <= input$iv_mean_range[2]
-        )
-    }
-    
-    #### filter Giration radius range ###########################################
-    if ("RG" %in% input$show_mucilbiochsummarycols) {
-      mucilbiochsummary <- mucilbiochsummary %>%
-        filter(
-          RG_mean >= input$rg_mean_range[1] & RG_mean <= input$rg_mean_range[2]
-        )
-    }
-    
-    #### filter Hydrodynamic radius mean range ###########################################
-    if ("RH" %in% input$show_mucilbiochsummarycols) {
-      mucilbiochsummary <- mucilbiochsummary %>%
-        filter(
-          RH_mean >= input$rh_mean_range[1] & RH_mean <= input$rh_mean_range[2]
-        )
+    ### filter on mean
+    if ("_mean" %in% input$show_summarycols) {
+      #### filter Gal_A range ###########################################
+      if ("Gal_A" %in% input$show_mucilbiochsummarycols) {
+        # %>% function is bugged, generating:
+        ## Error in eval(substitute(expr), envir, enclos) : 
+        ##      incorrect length (0), expecting: 1272
+        #      mucilbiochsummary <- mucilbiochsummary %>%
+        #        filter(
+        #          Gal_A_mean >= input$gala_mean_range[1] & Gal_A_mean <= input$gala_mean_range[2]
+        #        )
+        ## nor this syntax works
+        #      mucilbiochsummary <- filter(mucilbiochsummary, Gal_A_mean >= input$gala_mean_range[1] & Gal_A_mean <= input$gala_mean_range[2])
+        ## this classical one works
+        mucilbiochsummary <- mucilbiochsummary[which(mucilbiochsummary$Gal_A_mean >= input$gala_mean_range[1] & mucilbiochsummary$Gal_A_mean <= input$gala_mean_range[2]), 1:ncol(mucilbiochsummary), drop=FALSE]      
+      }
+      
+      #### filter OsesNeutres mean range ###########################################
+      if ("OsesNeutres" %in% input$show_mucilbiochsummarycols) {
+        mucilbiochsummary <- mucilbiochsummary %>%
+          filter(
+            OsesNeutres_mean >= input$ozn_mean_range[1] & OsesNeutres_mean <= input$ozn_mean_range[2]
+          )
+      }
+      
+      #### filter Molecular weight mean range ###########################################
+      if ("MW" %in% input$show_mucilbiochsummarycols) {
+        mucilbiochsummary <- mucilbiochsummary %>%
+          filter(
+            MW_mean >= input$mw_mean_range[1] & MW_mean <= input$mw_mean_range[2]
+          )
+      }    
+      
+      #### filter Intrinsic viscosity mean range ###########################################
+      if ("IV" %in% input$show_mucilbiochsummarycols) {
+        mucilbiochsummary <- mucilbiochsummary %>%
+          filter(
+            IV_mean >= input$iv_mean_range[1] & IV_mean <= input$iv_mean_range[2]
+          )
+      }
+      
+      #### filter Giration radius range ###########################################
+      if ("RG" %in% input$show_mucilbiochsummarycols) {
+        mucilbiochsummary <- mucilbiochsummary %>%
+          filter(
+            RG_mean >= input$rg_mean_range[1] & RG_mean <= input$rg_mean_range[2]
+          )
+      }
+      
+      #### filter Hydrodynamic radius mean range ###########################################
+      if ("RH" %in% input$show_mucilbiochsummarycols) {
+        mucilbiochsummary <- mucilbiochsummary %>%
+          filter(
+            RH_mean >= input$rh_mean_range[1] & RH_mean <= input$rh_mean_range[2]
+          )
+      }
     }
     
     # return at last
