@@ -200,6 +200,16 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         fluidRow(
           tags$br(),
           column(4,
+                 checkboxInput("groupByCulture", label = strong("group by culture"), value = FALSE)
+                 ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, summary dataset is grouped by accession AV number/NAME. Checking the 'group by culture' will summary the dataset by accession AV number/NAME and culture.")
+                 )
+          ),
+        fluidRow(
+          tags$br(),
+          column(4,
                  selectizeInput("show_summarycols", label = strong("Summary dataset columns"), 
                                 choices = choices_summarycols, 
                                 selected = choices_summarycols[c(4,8)],
