@@ -198,6 +198,20 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                  )
           ),
         fluidRow(
+          tags$br(),
+          column(4,
+                 selectizeInput("show_summarycols", label = strong("Summary dataset columns"), 
+                                choices = choices_summarycols, 
+                                selected = choices_summarycols[c(4,8)],
+                                multiple = TRUE)
+          ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, only mean and standard deviation columns are selected. You can add additional or remove available summary columns from the drop-down menu. 
+                          Multiple choice is allowed.")
+          )
+        ),
+        fluidRow(
           column(5,
                  tags$br(),
                  tags$div("Sliders allow you to filter dataset on the values range."),
