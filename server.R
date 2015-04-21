@@ -420,7 +420,7 @@ shinyServer(function(input, output, session) {
 #   )
 
   # mandatory mucilage biochemical datasets columns
-  mandatory_mucilbiochcols <- names(db.bioch.all.clean)[1:4]  
+  mandatory_mucilbiochcols <- names(db.bioch.all.clean)[1:5]  
 
   ### raw ###########################################
 
