@@ -47,11 +47,15 @@ choices_climatodatasets <- list(
   "MEAN MONTHLY TEMP RANGE" = 'mmtr'
 )
 
+# search accessions by name on map
+choices_acc_names_map <- as.list(na.omit(db.climate.geoloc$NAME))
+names(choices_acc_names_map) <- na.omit(db.climate.geoloc$NAME)
+
 # AmuseDB connection
 con <- odbcConnect("Amuse")
 
 # sql
-sql <- "select g.av_nr, p.culture, p.seed_pool, d.repet_nr, b.gal_a, b.oz_n, b.mw, b.iv, b.rg, b.rh, g.city, g.country
+sql <- "select g.acc_name, g.av_nr, p.culture, p.seed_pool, d.repet_nr, b.gal_a, b.oz_n, b.mw, b.iv, b.rg, b.rh, g.city, g.country
 from am_genotype as g
 join am_plant as p on p.am_genotype_id=g.id
 join am_data as d on d.am_plant_id=p.id
@@ -66,6 +70,7 @@ odbcClose(con)
 # all plants
 db.bioch.all <- db.res %>%
   select(
+    NAME = acc_name,
     AV = av_nr,
     Culture = culture,
     SeedPool = seed_pool,
@@ -92,14 +97,18 @@ db.bioch.all.clean <- db.bioch.all %>%
     RG != "ND",
     RH != "ND"
   )
-## filtering ND values allows to sort columns 5:10 numerically
-db.bioch.all.clean[,5:10] <- sapply(5:10, function(i){
+## filtering ND values allows to sort columns 6:11 numerically
+db.bioch.all.clean[,6:11] <- sapply(6:11, function(i){
   as.numeric(as.vector(db.bioch.all.clean[,i]))
 })
 
 # update raw dataset
 ## add name
-db.bioch.all.clean <- dplyr::left_join(db.bioch.all.clean, db.climate.geoloc[,c("AV", "NAME")], by = "AV")
+#db.bioch.all.clean <- dplyr::left_join(db.bioch.all.clean, db.climate.geoloc[,c("AV", "NAME")], by = "AV")
+
+# search accessions by name
+choices_acc_names <- as.list(na.omit(db.bioch.all.clean$NAME))
+names(choices_acc_names) <- na.omit(db.bioch.all.clean$NAME)
 
 # 4 plants accessions w/o missing values
 ## count plants by accession

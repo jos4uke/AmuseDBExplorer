@@ -47,7 +47,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                   
                   h3("Search arabidopsis accessions"),
                   textInput(inputId = "select_av_map", label = strong("Fill in AV number(s)"), value = "All"),
-                  
+                  tags$br(),
+                  selectizeInput("show_accessions_name_map", label = strong("Select accessions by name"), 
+                                 choices = choices_acc_names_map,
+                                 selected = "",
+                                 multiple = TRUE),
                   hr(),
                   h4("Accession informations")
     ),
@@ -94,6 +98,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         tags$a(href="https://www.pik-potsdam.de/members/cramer/climate", "(Cramer&Leemans database, version 2.1)")
       ),  
       ### constant #########################################
+      #### search by AV number
       fluidRow(
         tags$br(),
         column(4,
@@ -103,6 +108,20 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         tags$br(),
         tags$div("By default, all data is shown. Provide accession AV number to filter dataset. 
                  Multiple AV numbers is allowed separated by blank space or newline.")
+        )
+        ),
+      #### search by name
+      fluidRow(
+        tags$br(),
+        column(4,
+               selectizeInput("show_accessions_name", label = strong("Select accessions by name"), 
+                              choices = choices_acc_names,
+                              selected = "",
+                              multiple = TRUE)
+               ),
+        column(4,
+               tags$br(),
+               tags$div("You can search accession by name. Multiple choice is allowed.")
         )
         ),
         
