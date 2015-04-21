@@ -280,6 +280,40 @@ shinyServer(function(input, output, session) {
     }
     return(x)
   })
+
+  ### input accessions names ###########################################
+  observe({
+    x <- input$show_accessions_name
+    
+    if ( x == "" || is.null(x) || is.na(x) ) {
+      return()
+    }
+    avsbynames <- unique(db.bioch.all.clean %>%
+                    filter(NAME %in% x) %>%
+                    select(AV)
+                  )
+    y <- isolate(input$select_av)
+    stillSelectedAVS <- as.numeric(split_string(y))
+    if ( !( stillSelectedAVS == "All" ||  stillSelectedAVS == "" || is.null(stillSelectedAVS) || is.na(stillSelectedAVS) ) ) {
+#       selectedAVS <- stillSelectedAVS
+      selectedAVS <- unique(c(stillSelectedAVS, unlist(avsbynames)))
+    } else {
+      selectedAVS <- avsbynames
+    }
+    
+#     print(avsbynames)
+#     print(class(avsbynames))
+#     
+#     print(stillSelectedAVS)
+#     print(class(stillSelectedAVS))
+#     
+#     print(paste(selectedAVS, sep=" "))
+#     print(class(selectedAVS))    
+    
+    # at last
+    updateTextInput(session, "select_av", value = paste(selectedAVS, collapse=" "))
+  })
+
   
   ### dynamic sliders ###########################################
   

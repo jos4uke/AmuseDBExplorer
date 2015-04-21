@@ -102,6 +102,9 @@ db.bioch.all.clean[,6:11] <- sapply(6:11, function(i){
 ## add name
 #db.bioch.all.clean <- dplyr::left_join(db.bioch.all.clean, db.climate.geoloc[,c("AV", "NAME")], by = "AV")
 
+# search accessions by name
+choices_acc_names <- as.list(na.omit(db.bioch.all.clean$NAME))
+names(choices_acc_names) <- na.omit(db.bioch.all.clean$NAME)
 
 # 4 plants accessions w/o missing values
 ## count plants by accession
