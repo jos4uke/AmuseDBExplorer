@@ -47,7 +47,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                   
                   h3("Search arabidopsis accessions"),
                   textInput(inputId = "select_av_map", label = strong("Fill in AV number(s)"), value = "All"),
-                  
+                  tags$br(),
+                  selectizeInput("show_accessions_name_map", label = strong("Select accessions by name"), 
+                                 choices = choices_acc_names_map,
+                                 selected = "",
+                                 multiple = TRUE),
                   hr(),
                   h4("Accession informations")
     ),

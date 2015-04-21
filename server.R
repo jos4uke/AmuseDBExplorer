@@ -314,6 +314,29 @@ shinyServer(function(input, output, session) {
     updateTextInput(session, "select_av", value = paste(selectedAVS, collapse=" "))
   })
 
+  ### input accessions names on map ###########################################
+  observe({
+    x <- input$show_accessions_name_map
+    
+    if ( x == "" || is.null(x) || is.na(x) ) {
+      return()
+    }
+    avsbynames <- unique(db.climate.geoloc %>%
+                          filter(NAME %in% x) %>%
+                          select(AV)
+                        )
+    
+    y <- isolate(input$select_av_map)
+    stillSelectedAVS <- as.numeric( split_string(y) )
+    if ( !( stillSelectedAVS == "All" ||  stillSelectedAVS == "" || is.null(stillSelectedAVS) || is.na(stillSelectedAVS) ) ) {
+      selectedAVS <- unique(c(stillSelectedAVS, unlist(avsbynames)))
+    } else {
+      selectedAVS <- avsbynames
+    }
+    
+    # at last
+    updateTextInput(session, "select_av_map", value = paste(selectedAVS, collapse=" "))
+  })
   
   ### dynamic sliders ###########################################
   

@@ -47,6 +47,10 @@ choices_climatodatasets <- list(
   "MEAN MONTHLY TEMP RANGE" = 'mmtr'
 )
 
+# search accessions by name on map
+choices_acc_names_map <- as.list(na.omit(db.climate.geoloc$NAME))
+names(choices_acc_names_map) <- na.omit(db.climate.geoloc$NAME)
+
 # AmuseDB connection
 con <- odbcConnect("Amuse")
 
