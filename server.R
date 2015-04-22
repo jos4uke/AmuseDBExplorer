@@ -789,6 +789,14 @@ shinyServer(function(input, output, session) {
           AV %in% avs
         )
     }
+
+    #### filter accessions by geoloc qualities ###########################################
+    if (!is.null(input$show_geolocquals)) {
+      geoclimato <- geoclimato %>%
+        filter(
+          GEOLOC_QUAL %in% input$show_geolocquals
+          )
+    }
     
     #### filter latitude/longitude range ###########################################
     geoclimato <- geoclimato %>%
