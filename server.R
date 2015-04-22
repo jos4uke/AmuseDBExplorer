@@ -80,6 +80,12 @@ shinyServer(function(input, output, session) {
       tags$strong(HTML(sprintf("- %s: %d",
                                "Total accessions", length(unique(db.climate.geoloc$AV))
       ))), tags$br(),
+      tags$li(sprintf("%s: %d", 
+                      "total accessions with geoloc data", length(acc_gps$AV)
+      )),
+      tags$li(sprintf("%s: %d (%s)", 
+                      "total accessions without geoloc data", length(acc_wogps$AV), paste(acc_wogps$AV, collapse=", ")
+      )), tags$br(),
       tags$strong(HTML(sprintf("- %s: %d",
                                "Climate datasets", length(names(choices_climatodatasets))
       ))), tags$br(),

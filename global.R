@@ -32,6 +32,13 @@ db.climate.geoloc[6:7] <- sapply(6:7, function(i){
   as.numeric(as.vector(db.climate.geoloc[,i]))
 })
 
+### accessions with gps coordinates
+acc_gps <- db.climate.geoloc %>%
+  filter(!(is.na(LATITUDE) & is.na(LONGITUDE)))
+### accessions without gps coordinates
+acc_wogps <- db.climate.geoloc %>%
+  filter(is.na(LATITUDE) & is.na(LONGITUDE))
+
 ### gps coordinates: LATITUDE/LONGITUDE
 min_lat <- min(db.climate.geoloc$LATITUDE, na.rm=TRUE)-0.5
 max_lat <- max(db.climate.geoloc$LATITUDE, na.rm=TRUE)+0.5
