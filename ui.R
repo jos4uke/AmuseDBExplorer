@@ -8,7 +8,7 @@
 suppressPackageStartupMessages(library(shiny))
 suppressPackageStartupMessages(library(leaflet))
 
-shinyUI(navbarPage("AmuseDBExplorer", id="nav",
+shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
   
   tabPanel("Interactive map",
       fluidPage(      
@@ -18,7 +18,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
           includeScript("gomap.js")
         ),
 
-        htmlOutput("mapp", inline=TRUE),
+        fluidRow(
+          column(12,
+                 uiOutput("mapp", inline=TRUE)
+                 )
+          ),
         absolutePanel(top = 75, left = "auto", right = 35, bottom = "auto",
                     selectInput("mapPick", strong("Background Map"),c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
                                                               "MapQuestOSM" = "http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", # works!
@@ -27,7 +31,7 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
         ),
       
       # Shiny versions prior to 0.11 should use class="modal" instead.
-      absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+      absolutePanel(id = "controls", class = "panel panel-default", 
                     draggable = TRUE, top = 160, left = "auto", right = 40, bottom = "auto",
                     width = 330, height = "auto",
                     

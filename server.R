@@ -160,12 +160,12 @@ shinyServer(function(input, output, session) {
   })
   
   zoom <- reactive({
-    ifelse(is.null(input$map_zoom),3,input$map_zoom)
+    ifelse(is.null(input$map_zoom), 3, input$map_zoom)
   })
   
   center <- reactive({
     if(is.null(input$map_bounds)) {
-      c(45, 5)
+      c(24, 28)
     } else {
       map_bounds <- input$map_bounds
       c((map_bounds$north + map_bounds$south)/2.0,(map_bounds$east + map_bounds$west)/2.0)
@@ -262,7 +262,7 @@ shinyServer(function(input, output, session) {
       accessions <- accessionsInBounds()
       if (nrow(accessionsInBounds()) == 0)
         return()
-      
+
       # Define colors
       geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
       qual_colors <- c("green", "orange", "blue", "grey")
