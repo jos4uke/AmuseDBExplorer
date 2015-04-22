@@ -50,6 +50,7 @@ choices_climatodatasets <- list(
 # search accessions by name on map
 choices_acc_names_map <- as.list(na.omit(db.climate.geoloc$NAME))
 names(choices_acc_names_map) <- na.omit(db.climate.geoloc$NAME)
+choices_acc_names_map$All <- "All"
 
 # AmuseDB connection
 con <- odbcConnect("Amuse")
@@ -109,6 +110,7 @@ db.bioch.all.clean[,6:11] <- sapply(6:11, function(i){
 # search accessions by name
 choices_acc_names <- as.list(na.omit(db.bioch.all.clean$NAME))
 names(choices_acc_names) <- na.omit(db.bioch.all.clean$NAME)
+choices_acc_names$All <- "All"
 
 # 4 plants accessions w/o missing values
 ## count plants by accession

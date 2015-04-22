@@ -147,9 +147,9 @@ shinyServer(function(input, output, session) {
             )
         
         # fitsbound
-        if ( length(req_acc) == 1 ) {
+        if ( length(req_acc$AV) == 1 ) {
           map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, zoom(), forceReset = FALSE)
-        } else {
+        } else if (length(req_acc$AV) > 0) {
           sw_margin <- 5
           ne_margin <- 5
           sw <- list(lat1=min(req_acc$LATITUDE), lng1=min(req_acc$LONGITUDE))
@@ -285,7 +285,7 @@ shinyServer(function(input, output, session) {
   observe({
     x <- input$show_accessions_name
     
-    if ( x == "" || is.null(x) || is.na(x) ) {
+    if ( x == "All" || x == "" || is.null(x) || is.na(x) ) {
       return()
     }
     avsbynames <- unique(db.bioch.all.clean %>%
@@ -301,15 +301,6 @@ shinyServer(function(input, output, session) {
       selectedAVS <- avsbynames
     }
     
-#     print(avsbynames)
-#     print(class(avsbynames))
-#     
-#     print(stillSelectedAVS)
-#     print(class(stillSelectedAVS))
-#     
-#     print(paste(selectedAVS, sep=" "))
-#     print(class(selectedAVS))    
-    
     # at last
     updateTextInput(session, "select_av", value = paste(selectedAVS, collapse=" "))
   })
@@ -318,7 +309,7 @@ shinyServer(function(input, output, session) {
   observe({
     x <- input$show_accessions_name_map
     
-    if ( x == "" || is.null(x) || is.na(x) ) {
+    if ( x == "All" || x == "" || is.null(x) || is.na(x) ) {
       return()
     }
     avsbynames <- unique(db.climate.geoloc %>%
