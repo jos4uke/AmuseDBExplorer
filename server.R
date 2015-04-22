@@ -94,6 +94,22 @@ shinyServer(function(input, output, session) {
   
   ## Interactive Map ###########################################
   
+  ### map informations ###########################################
+  output$mapdesc <- reactive({
+    if (is.null(input$map_bounds))
+      return(list())
+    desc <- list(
+      lat = mean(c(input$map_bounds$north, input$map_bounds$south)),
+      lng = mean(c(input$map_bounds$east, input$map_bounds$west)),
+      zoom = input$map_zoom,
+      shownAccs = nrow(accessionsInBounds()),
+      totalAccs = length(db.climate.geoloc$AV)
+    )
+    HTML(paste('The map is centered at ', strong(desc$lat), ' latitude, ', strong(desc$lng), 'longitude,',
+               'with a zoom level of ', strong(desc$zoom), '.<br/>',
+               strong(desc$shownAccs), 'out of ', strong(desc$totalAccs), 'visible accessions are displayed.'))
+  })
+  
   ### input accessions AV numbers ###########################################
   input_avs_map <- reactive({
     y <- input$select_av_map

@@ -39,6 +39,11 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                                    selected = "All",
                                    multiple = TRUE),
                     hr(),
+                    h4("Map informations"),
+                    htmlOutput(
+                      outputId = 'mapdesc', inline=TRUE
+                    ),
+                    tags$br(),
                     h4("Accession informations")
       ),
       
