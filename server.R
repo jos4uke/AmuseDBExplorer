@@ -181,11 +181,16 @@ shinyServer(function(input, output, session) {
       return(db.climate.geoloc[FALSE,])
     bounds <- input$map_bounds
     latRng <- range(bounds$north, bounds$south)
-    lngRng <- range(bounds$east, bounds$west)
+    lngRng <- range(bounds$east, bounds$west)  
     
-    subset(db.climate.geoloc,
+    acc_in_bounds <- subset(db.climate.geoloc,
            LATITUDE >= latRng[1] & LATITUDE <= latRng[2] &
              LONGITUDE >= lngRng[1] & LONGITUDE <= lngRng[2])
+    acc_not_in_bounds <- db.climate.geoloc %>%
+                            filter(!(AV %in% acc_in_bounds$AV))
+#     # not in bounds: 179 214 227 294 298
+#     print(acc_not_in_bounds$AV)
+    acc_in_bounds
   })
   
 #   observe({
