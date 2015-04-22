@@ -11,54 +11,51 @@ suppressPackageStartupMessages(library(leaflet))
 shinyUI(navbarPage("AmuseDBExplorer", id="nav",
   
   tabPanel("Interactive map",
-    div(class="outer",
-               
-      tags$head(
-        # Include our custom CSS
-        includeCSS("styles.css"),
-        includeScript("gomap.js")
+      fluidPage(      
+        tags$head(
+          # Include our custom CSS
+          includeCSS("styles.css"),
+          includeScript("gomap.js")
+        ),
+
+        htmlOutput("mapp", inline=TRUE),
+        absolutePanel(top = 75, left = "auto", right = 35, bottom = "auto",
+                    selectInput("mapPick", strong("Background Map"),c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
+                                                              "MapQuestOSM" = "http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", # works!
+                                                              "MapQuestOpen.Aerial"= "http://oatile3.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg"), # works!
+                                selected = c("http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg")) # default: MapQuestOSM
+        ),
+      
+      # Shiny versions prior to 0.11 should use class="modal" instead.
+      absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                    draggable = TRUE, top = 160, left = "auto", right = 40, bottom = "auto",
+                    width = 330, height = "auto",
+                    
+                    h3("Search arabidopsis accessions"),
+                    textInput(inputId = "select_av_map", label = strong("Fill in AV number(s)"), value = "All"),
+                    tags$br(),
+                    selectizeInput("show_accessions_name_map", label = strong("Select accessions by name"), 
+                                   choices = choices_acc_names_map,
+                                   selected = "All",
+                                   multiple = TRUE),
+                    hr(),
+                    h4("Accession informations")
       ),
       
-      #map <- leaflet(base.map="mqosm"),
-      #includeHTML(map) # browseURL(map)
-      #leafletMap("map", width="100%", height="100%",
-      #           initialTileLayer = "http//otile4.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
-      #           #initialTileLayer = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      #           initialTileLayerAttribution = HTML('© MapQuest, Map Data © OpenStreetMap contributors, ODbL'),
-      #           #options=NULL
-      #           options=list(
-      #              center = c(37.45, -93.85),
-      #              zoom = 4,
-      #              maxBounds = list(list(15.961329,-129.92981), list(52.908902,-56.80481)) # Show US only
-      #            )
-      #)
-      htmlOutput("mapp",inline=TRUE)),
-      absolutePanel(top = 60, left = "auto", right = 20, bottom = "auto",
-                  selectInput("mapPick", strong("Background Map"),c("OpenStreetMap" = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", # works!
-                                                            "MapQuestOSM" = "http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg", # works!
-                                                            "MapQuestOpen.Aerial"= "http://oatile3.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg"), # works!
-                              selected = c("http://oatile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg")) # default: MapQuestOSM
+      # AMUSEDB infos
+      fluidRow(
+        column(8, offset=3,
+               h3(strong('AMUSEDB'), ': Arabidopsis Mucilage Natural Variability Database'),
+               htmlOutput(
+                 outputId = 'desc'
+               )
+        )
+      )
     ),
-    
-    # Shiny versions prior to 0.11 should use class="modal" instead.
-    absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                  draggable = TRUE, top = 150, left = "auto", right = 25, bottom = "auto",
-                  width = 330, height = "auto",
-                  
-                  h3("Search arabidopsis accessions"),
-                  textInput(inputId = "select_av_map", label = strong("Fill in AV number(s)"), value = "All"),
-                  tags$br(),
-                  selectizeInput("show_accessions_name_map", label = strong("Select accessions by name"), 
-                                 choices = choices_acc_names_map,
-                                 selected = "All",
-                                 multiple = TRUE),
-                  hr(),
-                  h4("Accession informations")
-    ),
-    
     # cite
-    tags$div(id="cite",
-             strong('Data compiled for ', tags$em('ANR AMUSE project 2009-2012 (Helen North, IJPB/INRA)'), ' by Joseph Tran (IJPB/INRA).')
+    tags$br(),
+    tags$div(
+             strong('Data compiled for ', tags$em('AMUSE ANR project 2009-2012 (Helen North, IJPB/INRA)'), ' by Joseph Tran (IJPB/INRA).')
     )
   ),
   

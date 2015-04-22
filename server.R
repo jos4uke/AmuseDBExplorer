@@ -13,10 +13,85 @@ split_string <- function(string) {
   unlist(strsplit(string, split="[\\s\\n]+", perl=TRUE))
 }
 
+get_controls_av_name <- function() {
+  uniq <- unique(db.bioch.controls %>%
+            select(
+                AV, NAME
+              ))
+  unlist(lapply(unique(db.bioch.controls$AV), function(c){
+    paste(c, "(", uniq[uniq$AV == c, "NAME"], ")")
+  }))
+}
 
 # SERVER
 shinyServer(function(input, output, session) {
 
+  ## Database description ###########################################
+  output$desc <- renderUI({
+    content <- as.character(tagList(
+      tags$h4(strong("Raw/summary datasets:")),
+      tags$strong(HTML(sprintf("- %s: %d",
+                               "Total accessions (+ controls)", length(unique(db.bioch.all$AV))
+      ))), tags$br(),
+      tags$li(sprintf("%s: %d", 
+                     "in complete datasets", length(unique(db.bioch.all.clean$AV))
+      )),
+      tags$li(sprintf("%s: %d (%s)", 
+                     "in incomplete datasets (NA/ND values)", length(unique(db.bioch.incomplete$AV)), paste(unique(db.bioch.incomplete$AV), collapse=", ")
+      )), tags$strong("- in summary dataset:"),
+      tags$li(sprintf("%s: %d", 
+                      "with 4 plants", length(dimnames(p4)[[1]])
+      )),
+      tags$li(sprintf("%s: %d (%s)", 
+                      "without 4 plants", length(unique(db.bioch.no4p$AV)), paste(unique(db.bioch.no4p$AV), collapse=", ")
+      )), tags$br(),
+      tags$strong(HTML(sprintf("- %s: %d (%s)",
+                               "Total cultures", length(unique(db.bioch.all$Culture)), paste(unique(db.bioch.all$Culture), collapse=", ")
+      ))), tags$br(),
+      tags$li(sprintf("%s: %d", 
+                      "in complete datasets", length(unique(db.bioch.all.clean$Culture))
+      )),
+      tags$li(sprintf("%s: %d", 
+                      "in incomplete datasets", length(unique(db.bioch.incomplete$Culture))
+      )), tags$br(),
+      tags$strong(HTML(sprintf("- %s: %d",
+                               "Total seed pools", length(unique(db.bioch.all$SeedPool))
+      ))), tags$br(),
+      tags$li(sprintf("%s: %d", 
+                     "in complete datasets", length(unique(db.bioch.all.clean$SeedPool))
+      )),
+      tags$li(sprintf("%s: %d", 
+                     "in incomplete datasets", length(unique(db.bioch.incomplete$SeedPool))
+      )), tags$br(),
+      tags$strong(HTML(sprintf("- %s: %d",
+                               "Total controls", length(unique(db.bioch.controls$AV))
+      ))), tags$br(),
+      tags$li(sprintf("%s: %s", 
+                      'control_av (name)' , paste(get_controls_av_name(), collapse=", ")
+      )),tags$br(),
+      tags$strong(HTML(sprintf("- %s: %d",
+                               "Soluble mucilage biochemical variables", length(choices_mucilbiochcols)
+      ))), tags$br(),
+      tags$li(sprintf("%s: %s", 
+                      'list' , paste(names(choices_mucilbiochcols), collapse=", ")
+      )),tags$br(),
+      tags$h4(strong("Geoloc climate datasets:")), 
+      tags$a(href="https://www.pik-potsdam.de/members/cramer/climate", "(Cramer&Leemans database, version 2.1)"), tags$br(),
+      tags$strong(HTML(sprintf("- %s: %d",
+                               "Total accessions", length(unique(db.climate.geoloc$AV))
+      ))), tags$br(),
+      tags$strong(HTML(sprintf("- %s: %d",
+                               "Climate datasets", length(names(choices_climatodatasets))
+      ))), tags$br(),
+      tags$li(sprintf("%s: %s", 
+                      "list", paste(names(choices_climatodatasets), collapse=", ")
+      ))
+    ))
+    
+    # at last
+    content
+  })
+  
   ## Interactive Map ###########################################
   
   ### input accessions AV numbers ###########################################
@@ -51,7 +126,7 @@ shinyServer(function(input, output, session) {
   output$mapp <- renderUI({
     input$mapPick
     isolate({
-      leafletMap("map", "100%", "100%",
+      leafletMap("map", "100%", 900,
                  initialTileLayer = input$mapPick,
                  initialTileLayerAttribution = HTML('© MapQuest, Map Data © OpenStreetMap contributors, ODbL'),
                  options=list(
