@@ -80,6 +80,12 @@ shinyServer(function(input, output, session) {
       tags$strong(HTML(sprintf("- %s: %d",
                                "Total accessions", length(unique(db.climate.geoloc$AV))
       ))), tags$br(),
+      tags$li(sprintf("%s: %d", 
+                      "total accessions with geoloc data", length(acc_gps$AV)
+      )),
+      tags$li(sprintf("%s: %d (%s)", 
+                      "total accessions without geoloc data", length(acc_wogps$AV), paste(acc_wogps$AV, collapse=", ")
+      )), tags$br(),
       tags$strong(HTML(sprintf("- %s: %d",
                                "Climate datasets", length(names(choices_climatodatasets))
       ))), tags$br(),
@@ -154,12 +160,12 @@ shinyServer(function(input, output, session) {
   })
   
   zoom <- reactive({
-    ifelse(is.null(input$map_zoom),3,input$map_zoom)
+    ifelse(is.null(input$map_zoom), 3, input$map_zoom)
   })
   
   center <- reactive({
     if(is.null(input$map_bounds)) {
-      c(45, 5)
+      c(24, 28)
     } else {
       map_bounds <- input$map_bounds
       c((map_bounds$north + map_bounds$south)/2.0,(map_bounds$east + map_bounds$west)/2.0)
@@ -175,11 +181,16 @@ shinyServer(function(input, output, session) {
       return(db.climate.geoloc[FALSE,])
     bounds <- input$map_bounds
     latRng <- range(bounds$north, bounds$south)
-    lngRng <- range(bounds$east, bounds$west)
+    lngRng <- range(bounds$east, bounds$west)  
     
-    subset(db.climate.geoloc,
+    acc_in_bounds <- subset(db.climate.geoloc,
            LATITUDE >= latRng[1] & LATITUDE <= latRng[2] &
              LONGITUDE >= lngRng[1] & LONGITUDE <= lngRng[2])
+    acc_not_in_bounds <- db.climate.geoloc %>%
+                            filter(!(AV %in% acc_in_bounds$AV))
+#     # not in bounds: 179 214 227 294 298
+#     print(acc_not_in_bounds$AV)
+    acc_in_bounds
   })
   
 #   observe({
@@ -239,7 +250,8 @@ shinyServer(function(input, output, session) {
         
         # fitsbound
         if ( length(req_acc$AV) == 1 ) {
-          map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, zoom(), forceReset = FALSE)
+#           map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, zoom(), forceReset = FALSE)
+          map$fitBounds(req_acc$LATITUDE-5, req_acc$LONGITUDE-5, req_acc$LATITUDE+5, req_acc$LONGITUDE+5)
         } else if (length(req_acc$AV) > 0) {
           sw_margin <- 5
           ne_margin <- 5
@@ -256,7 +268,7 @@ shinyServer(function(input, output, session) {
       accessions <- accessionsInBounds()
       if (nrow(accessionsInBounds()) == 0)
         return()
-      
+
       # Define colors
       geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
       qual_colors <- c("green", "orange", "blue", "grey")
