@@ -317,6 +317,21 @@ shinyUI(navbarPage("AmuseDBExplorer", id="nav",
                           Multiple choice is allowed.")
           )
         ),
+        #### geoclimato datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+                 selectizeInput("show_geolocquals", label = strong("Select geoloc qualities"), 
+                                choices = choices_geoloc_qual, 
+                                selected = choices_geoloc_qual,
+                                multiple = TRUE)
+          ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, all geoloc qualities are selected. Delete item in the list, or select item from the drop-down menu. 
+                          Multiple choice is allowed.")
+          )
+        ),
         #### gps coordinates filtering
         fluidRow(
           tags$br(),

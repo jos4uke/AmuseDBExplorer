@@ -52,6 +52,10 @@ choices_acc_names_map <- as.list(na.omit(db.climate.geoloc$NAME))
 names(choices_acc_names_map) <- na.omit(db.climate.geoloc$NAME)
 choices_acc_names_map$All <- "All"
 
+# search accessions by geoloc quality
+choices_geoloc_qual <- as.list(unique(db.climate.geoloc$GEOLOC_QUAL))
+names(choices_geoloc_qual) <- unique(db.climate.geoloc$GEOLOC_QUAL)
+
 # AmuseDB connection
 con <- odbcConnect("Amuse")
 
