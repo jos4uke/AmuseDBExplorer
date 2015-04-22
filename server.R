@@ -147,9 +147,9 @@ shinyServer(function(input, output, session) {
             )
         
         # fitsbound
-        if ( length(req_acc) == 1 ) {
+        if ( length(req_acc$AV) == 1 ) {
           map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, zoom(), forceReset = FALSE)
-        } else {
+        } else if (length(req_acc$AV) > 0) {
           sw_margin <- 5
           ne_margin <- 5
           sw <- list(lat1=min(req_acc$LATITUDE), lng1=min(req_acc$LONGITUDE))
