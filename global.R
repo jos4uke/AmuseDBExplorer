@@ -111,6 +111,19 @@ db.bioch.all.clean[,6:11] <- sapply(6:11, function(i){
 ## add name
 #db.bioch.all.clean <- dplyr::left_join(db.bioch.all.clean, db.climate.geoloc[,c("AV", "NAME")], by = "AV")
 
+# incomplete datasets
+db.bioch.incomplete <- db.bioch.all %>%
+  filter(
+    !(AV %in% unique(db.bioch.all.clean$AV)) 
+    ) 
+
+# controls
+controls_av <- seq(from = 1000, to = 7000, by = 1000)
+db.bioch.controls <- db.bioch.all.clean %>%
+  filter(
+    AV %in% controls_av
+    )
+
 # search accessions by name
 choices_acc_names <- as.list(na.omit(db.bioch.all.clean$NAME))
 names(choices_acc_names) <- na.omit(db.bioch.all.clean$NAME)
@@ -163,3 +176,6 @@ choices_summarycols <- list(
   "standard deviation"= "_sd"
   )
 
+# no 4p accessions
+db.bioch.no4p <- db.bioch.all.clean %>%
+  filter(!(AV %in% p4$AV))
