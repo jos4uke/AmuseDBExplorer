@@ -448,6 +448,10 @@ shinyServer(function(input, output, session) {
   output$dynamic_gala_mean_slider <- renderUI({
     if (!"Gal_A" %in% input$show_mucilbiochsummarycols)
       return()
+    group_by_culture <- summaryByCulture()
+    if (!is.null(group_by_culture)) {
+      db.bioch.4p.summary <- group_by_culture
+    }
     min_gala_mean <- min(db.bioch.4p.summary$Gal_A_mean)-0.5
     max_gala_mean <- max(db.bioch.4p.summary$Gal_A_mean)+0.5
     sliderInput("gala_mean_range", strong("Gal_A mean range:"),
@@ -468,6 +472,10 @@ shinyServer(function(input, output, session) {
   output$dynamic_ozn_mean_slider <- renderUI({
     if (!"OsesNeutres" %in% input$show_mucilbiochsummarycols)
       return()
+    group_by_culture <- summaryByCulture()
+    if (!is.null(group_by_culture)) {
+      db.bioch.4p.summary <- group_by_culture
+    }
     min_ozn_mean <- min(db.bioch.4p.summary$OsesNeutres_mean)-0.5
     max_ozn_mean <- max(db.bioch.4p.summary$OsesNeutres_mean)+0.5
     sliderInput("ozn_mean_range", strong("OsesNeutres mean range:"),
@@ -488,6 +496,10 @@ shinyServer(function(input, output, session) {
   output$dynamic_mw_mean_slider <- renderUI({
     if (!"MW" %in% input$show_mucilbiochsummarycols)
       return()
+    group_by_culture <- summaryByCulture()
+    if (!is.null(group_by_culture)) {
+      db.bioch.4p.summary <- group_by_culture
+    }
     min_mw_mean <- min(db.bioch.4p.summary$MW_mean)-0.5
     max_mw_mean <- max(db.bioch.4p.summary$MW_mean)+0.5
     sliderInput("mw_mean_range", strong("MW mean range:"),
@@ -508,6 +520,10 @@ shinyServer(function(input, output, session) {
   output$dynamic_iv_mean_slider <- renderUI({
     if (!"IV" %in% input$show_mucilbiochsummarycols)
       return()
+    group_by_culture <- summaryByCulture()
+    if (!is.null(group_by_culture)) {
+      db.bioch.4p.summary <- group_by_culture
+    }
     min_iv_mean <- min(db.bioch.4p.summary$IV_mean)-0.5
     max_iv_mean <- max(db.bioch.4p.summary$IV_mean)+0.5
     sliderInput("iv_mean_range", strong("IV mean range:"),
@@ -528,6 +544,10 @@ shinyServer(function(input, output, session) {
   output$dynamic_rg_mean_slider <- renderUI({
     if (!"RG" %in% input$show_mucilbiochsummarycols)
       return()
+    group_by_culture <- summaryByCulture()
+    if (!is.null(group_by_culture)) {
+      db.bioch.4p.summary <- group_by_culture
+    }
     min_rg_mean <- min(db.bioch.4p.summary$RG_mean)-0.5
     max_rg_mean <- max(db.bioch.4p.summary$RG_mean)+0.5
     sliderInput("rg_mean_range", strong("RG mean range:"),
@@ -548,6 +568,10 @@ shinyServer(function(input, output, session) {
   output$dynamic_rh_mean_slider <- renderUI({
     if (!"RH" %in% input$show_mucilbiochsummarycols)
       return()
+    group_by_culture <- summaryByCulture()
+    if (!is.null(group_by_culture)) {
+      db.bioch.4p.summary <- group_by_culture
+    }
     min_rh_mean <- min(db.bioch.4p.summary$RH_mean)-0.5
     max_rh_mean <- max(db.bioch.4p.summary$RH_mean)+0.5
     sliderInput("rh_mean_range", strong("RH mean range:"),
@@ -705,11 +729,7 @@ shinyServer(function(input, output, session) {
   )
 
   ### summary ###########################################
-
-  datasetSummary <- reactive({
-    mandatory_mucilbiochsummarycols <- 1:2
-    
-    #### group by culture ###########################################
+  summaryByCulture <- reactive({
     if (input$groupByCulture) {
       db.bioch.4p.summary <- db.bioch.all.clean %>%
         filter(AV %in% p4$AV) %>%
@@ -717,9 +737,21 @@ shinyServer(function(input, output, session) {
         group_by(NAME, AV, Culture) %>%
         summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
       
+      db.bioch.4p.summary
+    }
+
+  })
+
+  datasetSummary <- reactive({
+    mandatory_mucilbiochsummarycols <- 1:2
+    
+    #### group by culture ###########################################
+    group_by_culture <- summaryByCulture()
+    if ( !(is.null(group_by_culture)) ) {
+      db.bioch.4p.summary <- group_by_culture
       mandatory_mucilbiochsummarycols <- 1:3
     }
-    
+      
     #### filter accessions by AV number ###########################################
     x <- input_avs()
     if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
@@ -748,7 +780,7 @@ shinyServer(function(input, output, session) {
       grep(pattern=d, x=names(mucilbiochsummary))
     }))
     mucilbiochsummary <- mucilbiochsummary[, c(mandatory_mucilbiochsummarycols, cols_by_dataset), drop=FALSE]
-    
+
     ### filter on mean
     if ("_mean" %in% input$show_summarycols) {
       #### filter Gal_A range ###########################################
