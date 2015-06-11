@@ -64,7 +64,7 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
     # cite
     tags$br(),
     tags$div(
-             strong('Data compiled for ', tags$em('AMUSE ANR project 2009-2012 (Helen North, IJPB/INRA)'), ' by Joseph Tran (IJPB/INRA).')
+             strong('Data compiled for ', tags$em('AMUSE ANR project 2009-2012 (Helen North (IJPB/INRA Versailles) and Marie-Christine Ralet (BIA/INRA Nantes))'), ' by Joseph Tran (IJPB/INRA Versailles).')
     )
   ),
   
