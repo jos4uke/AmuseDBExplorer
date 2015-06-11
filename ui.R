@@ -51,13 +51,10 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
                     h4("Accession informations")
       ),
       
-      # AMUSEDB infos
+      # AMUSEDB explorer frontend title
       fluidRow(
         column(8, offset=3,
-               h3(strong('AMUSEDB'), ': Arabidopsis Mucilage Natural Variability Database'),
-               htmlOutput(
-                 outputId = 'desc'
-               )
+               h3('Frontend interface to', strong('AMUSEDB'), ': Arabidopsis Mucilage Natural Variability Database')
         )
       )
     ),
@@ -375,5 +372,19 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
         
         )
       )
-    )
+    ),
+
+  tabPanel("Database information",
+   fluidPage(
+     # AMUSEDB infos
+     fluidRow(
+       column(8, offset=3,
+              h3(strong('AMUSEDB'), ': Arabidopsis Mucilage Natural Variability Database'),
+              htmlOutput(
+                outputId = 'desc'
+              )
+       )
+     )
+   )
+  )
 ))
