@@ -113,7 +113,9 @@ shinyServer(function(input, output, session) {
     )
     HTML(paste('The map is centered at ', strong(desc$lat), ' latitude, ', strong(desc$lng), 'longitude,',
                'with a zoom level of ', strong(desc$zoom), '.<br/>',
-               strong(desc$shownAccs), 'out of ', strong(desc$totalAccs), 'visible accessions are displayed.'))
+               strong(desc$shownAccs), 'out of ', strong(length(acc_gps$AV)), 'visible accessions are displayed. (over a total of', strong(desc$totalAccs), 'available accessions).'  ))
+  })
+  
   })
   
   ### input accessions AV numbers ###########################################
