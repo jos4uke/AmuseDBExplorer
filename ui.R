@@ -419,8 +419,19 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
           tags$br(),
           dataTableOutput("rnand")
         ),
-        tags$br()
+        tags$br(),
         #### geoclimato without gps coordinates
+        conditionalPanel('input.show_incompletedatasets.indexOf("gnogps") >= 0',
+          tags$h3("geoclimato without gps coordinates dataset"),
+          wellPanel(
+           tags$div("Download the geoclimato dataset without gps coordinates dataset results in csv format in zipped archive."),
+           downloadButton('downloadGeoclimatoNoGpsData', 'Download zip file')
+          ),
+          tags$br(),
+          dataTableOutput("gnogps")
+        ),
+        tags$br()
+        #### geoclimato with NA/ND values
         
       )
     ),

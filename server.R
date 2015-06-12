@@ -1128,4 +1128,61 @@ shinyServer(function(input, output, session) {
     },
     contentType = "application/zip"
   )
+
+#### Geoclimato without gps coordinates
+  datasetGeoclimatoNogps <- reactive({
+    #### filter accessions by AV number ###########################################
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
+      avs <- unique(acc_wogps$AV)
+    } else {
+      avs <- x
+    }
+    GeoclimatoNogps <- acc_wogps %>%
+      filter(
+        AV %in% avs
+      )
+    
+    # return at last
+    GeoclimatoNogps
+  })
+
+  output$gnogps <- renderDataTable({
+    datasetGeoclimatoNogps()
+  },
+  options = list(orderClasses = TRUE)
+  )
+  
+  output$downloadGeoclimatoNoGpsData <- downloadHandler(
+    filename = function() { 
+      paste('AMUSE_geoclimato_no_gps_dataset', format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss"), '.zip', sep='') 
+    },
+    content = function(file) {
+      print(file)
+      setwd(tempdir())
+      df <- datasetGeoclimatoNogps()
+      saveTime <- format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss")
+      baseFile <- paste('AMUSE_geoclimato_no_gps_dataset', saveTime, sep='')
+      # process csv file
+      csvFile <- paste(baseFile, '.csv', sep='')
+      write.csv2(df, csvFile, row.names=FALSE)
+      print(csvFile)
+      
+      # process metadata file
+      metadataFile <- paste(baseFile, '_metadata.txt', sep='')
+      sink(metadataFile)
+      cat(paste("Dataset File: ", csvFile, "\n",sep=''))
+      cat(paste("Metadata File: ", metadataFile, "\n",sep=''))
+      cat(paste("Date: ", saveTime, "\n",sep=''))
+      cat("AMUSE_geoclimato_no_gps_dataset\n")
+      cat("DataTable dimensions: ")
+      cat(dim(df), "\n")
+      cat("Contact: Joseph.Tran@versailles.inra.fr\n")
+      sink()
+      
+      # zip
+      zip(zipfile=file, files=c(csvFile, metadataFile))
+    },
+    contentType = "application/zip"
+  )
 })
