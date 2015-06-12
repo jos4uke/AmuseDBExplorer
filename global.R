@@ -63,6 +63,12 @@ choices_acc_names_map$All <- "All"
 choices_geoloc_qual <- as.list(unique(db.climate.geoloc$GEOLOC_QUAL))
 names(choices_geoloc_qual) <- unique(db.climate.geoloc$GEOLOC_QUAL)
 
+# Define colors
+geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
+qual_colors <- c("green", "orange", "blue", "grey")
+names(qual_colors) <- geoloc_qual
+colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
+
 # AmuseDB connection
 con <- odbcConnect("Amuse")
 

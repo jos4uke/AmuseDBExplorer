@@ -43,12 +43,13 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
                                    selected = "All",
                                    multiple = TRUE),
                     hr(),
-                    h4("Map informations"),
+                    h4("Map information"),
                     htmlOutput(
                       outputId = 'mapdesc', inline=TRUE
                     ),
                     tags$br(),
-                    h4("Accession informations")
+                    h4("Legend"),
+                    plotOutput(outputId = 'legend', width = 200, height = 200)
       ),
       
       # AMUSEDB explorer frontend title

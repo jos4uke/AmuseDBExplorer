@@ -7,6 +7,7 @@
 
 suppressPackageStartupMessages(library(shiny))
 suppressPackageStartupMessages(library(leaflet))
+suppressPackageStartupMessages(library(ggplot2))
 
 # FUNCTIONS
 split_string <- function(string) {
@@ -113,7 +114,32 @@ shinyServer(function(input, output, session) {
     )
     HTML(paste('The map is centered at ', strong(desc$lat), ' latitude, ', strong(desc$lng), 'longitude,',
                'with a zoom level of ', strong(desc$zoom), '.<br/>',
-               strong(desc$shownAccs), 'out of ', strong(desc$totalAccs), 'visible accessions are displayed.'))
+               strong(desc$shownAccs), 'out of ', strong(length(acc_gps$AV)), 'visible accessions are displayed. (over a total of', strong(desc$totalAccs), 'available accessions).'  ))
+  })
+  
+  ### map legend ###########################################
+  output$legend <- renderPlot({
+    cgl <- db.climate.geoloc # copy data
+    # rename column
+    names(cgl)[names(cgl)=="GEOLOC_QUAL"]  <- "Geo-location quality"
+    # sort columns
+    cgl.sort <- within(cgl, 
+                       `Geo-location quality` <- factor(`Geo-location quality`, 
+                                          levels=names(sort(table(`Geo-location quality`), 
+                                                            decreasing=TRUE))))
+    # adapt colors
+    qual_colors_2 <- qual_colors
+    qual_colors_2[qual_colors_2=="green"] <- "darkgreen" # the green is too light
+    
+    hist <- ggplot(cgl.sort, aes(`Geo-location quality`, fill=`Geo-location quality`, ymax=max(..count..)+100)) + 
+              geom_bar() +
+              geom_bar(show_guide=FALSE) +
+              scale_fill_manual(values=qual_colors_2) +
+              stat_bin(geom="text", aes(label=..count..), vjust=-1, size=4) +
+              ylim(0, 300) +  
+              theme(axis.ticks = element_blank(), axis.text.x = element_blank(), axis.title.x = element_blank()) +
+              theme(legend.position = "bottom", legend.direction = "vertical")
+    hist
   })
   
   ### input accessions AV numbers ###########################################
@@ -269,11 +295,11 @@ shinyServer(function(input, output, session) {
       if (nrow(accessionsInBounds()) == 0)
         return()
 
-      # Define colors
-      geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
-      qual_colors <- c("green", "orange", "blue", "grey")
-      names(qual_colors) <- geoloc_qual
-      colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
+#       # Define colors: moved to global.R
+#       geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
+#       qual_colors <- c("green", "orange", "blue", "grey")
+#       names(qual_colors) <- geoloc_qual
+#       colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
       acc_colors <- colors[match(accessions$AV, db.climate.geoloc$AV)]
       names(acc_colors) <- c() # reset names to get indexes back when add marks
       
