@@ -197,6 +197,5 @@ db.bioch.no4p <- db.bioch.all.clean %>%
 choices_incompletedatasets <- list(
   "raw with less than 4 plants" = "rlt4p",
   "raw with NA/ND values" = "rnand",
-  "geoclimato without gps coordinates" = "gnogps",
-  "geoclimato with NA/ND values" = "gnand"
+  "geoclimato without gps coordinates" = "gnogps"
   )

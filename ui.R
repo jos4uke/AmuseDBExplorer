@@ -103,7 +103,7 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
       ),
       conditionalPanel(
         'input.dataset === "incomplete"',
-        tags$div("Incomplete tab view provides incomplete datasets (raw with less than 4 plants, with NA/ND values, geoclimato without gps coordinates, with NA/ND values).")
+        tags$div("Incomplete tab view provides incomplete datasets (raw with less than 4 plants, with NA/ND values, geoclimato without gps coordinates).")
       ),
       ### constant #########################################
       #### search by AV number
