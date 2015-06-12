@@ -1012,4 +1012,65 @@ shinyServer(function(input, output, session) {
     },
     contentType = "application/zip"
   )
+
+### incomplete ###########################################
+
+#### Raw with less than 4 plants
+  datasetRawlt4p <- reactive({
+    #### filter accessions by AV number ###########################################
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
+      avs <- unique(db.bioch.no4p$AV)
+    } else {
+      avs <- x
+    }
+    Rawlt4p <- db.bioch.no4p %>%
+      filter(
+        AV %in% avs
+      )
+    
+    # return at last
+    Rawlt4p
+  })
+
+  output$rlt4p <- renderDataTable({
+    datasetRawlt4p()
+  },
+  options = list(orderClasses = TRUE)
+  )
+
+  output$downloadRawLessThan4PlantsData <- downloadHandler(
+    filename = function() { 
+      paste('AMUSE_raw_with_less_than_4_plants_dataset', format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss"), '.zip', sep='') 
+    },
+    content = function(file) {
+      print(file)
+      setwd(tempdir())
+      df <- datasetRawlt4p()
+      saveTime <- format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss")
+      baseFile <- paste('AMUSE_raw_with_less_than_4_plants_dataset', saveTime, sep='')
+      # process csv file
+      csvFile <- paste(baseFile, '.csv', sep='')
+      write.csv2(df, csvFile, row.names=FALSE)
+      print(csvFile)
+      
+      # process metadata file
+      metadataFile <- paste(baseFile, '_metadata.txt', sep='')
+      sink(metadataFile)
+      cat(paste("Dataset File: ", csvFile, "\n",sep=''))
+      cat(paste("Metadata File: ", metadataFile, "\n",sep=''))
+      cat(paste("Date: ", saveTime, "\n",sep=''))
+      cat("AMUSE_raw_with_less_than_4_plants_dataset\n")
+      cat("DataTable dimensions: ")
+      cat(dim(df), "\n")
+      cat("Contact: Joseph.Tran@versailles.inra.fr\n")
+      sink()
+      
+      # zip
+      zip(zipfile=file, files=c(csvFile, metadataFile))
+    },
+    contentType = "application/zip"
+  )
+
+#### Raw with NA/ND values
 })

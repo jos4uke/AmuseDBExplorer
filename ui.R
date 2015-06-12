@@ -83,7 +83,7 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
       fluidRow(
         column(4,
            selectInput("dataset", label = strong("Select dataset"), 
-                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary", "Geo-climato dataset" = "geoclimato"), 
+                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary", "Geo-climato dataset" = "geoclimato", "Incomplete dataset" = "incomplete"), 
                        selected = list("Raw dataset" = "raw"))
                )
         ),
@@ -100,7 +100,11 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
         'input.dataset === "geoclimato"',
         tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
         tags$a(href="https://www.pik-potsdam.de/members/cramer/climate", "(Cramer&Leemans database, version 2.1)")
-      ),  
+      ),
+      conditionalPanel(
+        'input.dataset === "incomplete"',
+        tags$div("Incomplete tab view provides incomplete datasets (raw with less than 4 plants, with NA/ND values, geoclimato without gps coordinates, with NA/ND values).")
+      ),
       ### constant #########################################
       #### search by AV number
       fluidRow(
@@ -372,6 +376,39 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
         dataTableOutput("geoclimato")
         
         )
+      ),
+    
+      ### incomplete  #########################################
+      conditionalPanel(
+        'input.dataset === "incomplete"',
+        #### incomplete datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+                 selectizeInput("show_incompletedatasets", label = strong("Select incomplete datasets"), 
+                                choices = choices_incompletedatasets, 
+                                selected = choices_incompletedatasets,
+                                multiple = TRUE)
+          ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
+                          Multiple choice is allowed.")
+                 )
+          ),
+        tags$hr(),
+        tags$h2("Results"),
+        #### raw with less than 4 plants
+        conditionalPanel('input.show_incompletedatasets.indexOf("rlt4p") >= 0',
+          tags$h3("raw with less than 4 plants dataset"),
+          wellPanel(
+            tags$div("Download the raw dataset with less than 4 plants dataset results in csv format in zipped archive."),
+            downloadButton('downloadRawLessThan4PlantsData', 'Download zip file')
+          ),
+          tags$br(),
+          dataTableOutput("rlt4p")
+        ),
+        tags$br()       
       )
     ),
 
