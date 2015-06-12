@@ -192,3 +192,10 @@ choices_summarycols <- list(
 # no 4p accessions
 db.bioch.no4p <- db.bioch.all.clean %>%
   filter(!(AV %in% p4$AV))
+
+# choices in incomplete
+choices_incompletedatasets <- list(
+  "raw with less than 4 plants" = "rlt4p",
+  "raw with NA/ND values" = "rnand",
+  "geoclimato without gps coordinates" = "gnogps"
+  )
