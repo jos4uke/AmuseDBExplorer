@@ -408,7 +408,20 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
           tags$br(),
           dataTableOutput("rlt4p")
         ),
-        tags$br()       
+        tags$br(),
+        #### raw with NA/ND values
+        conditionalPanel('input.show_incompletedatasets.indexOf("rnand") >= 0',
+          tags$h3("raw with NA/ND values dataset"),
+          wellPanel(
+           tags$div("Download the raw dataset with NA/ND values dataset results in csv format in zipped archive."),
+           downloadButton('downloadRawNandData', 'Download zip file')
+          ),
+          tags$br(),
+          dataTableOutput("rnand")
+        ),
+        tags$br()
+        #### geoclimato without gps coordinates
+        
       )
     ),
 

@@ -1073,4 +1073,59 @@ shinyServer(function(input, output, session) {
   )
 
 #### Raw with NA/ND values
+  datasetRawNand <- reactive({
+    #### filter accessions by AV number ###########################################
+    x <- input_avs()
+    if ( x == "All" ||  x == "" || is.null(x) || is.na(x) ) {
+      avs <- unique(db.bioch.incomplete$AV)
+    } else {
+      avs <- x
+    }
+    RawNand <- db.bioch.incomplete %>%
+      filter(
+        AV %in% avs
+      )
+    
+    # return at last
+    RawNand
+  })
+  
+  output$rnand <- renderDataTable({
+    datasetRawNand()
+  },
+  options = list(orderClasses = TRUE)
+  )
+  
+  output$downloadRawNandData <- downloadHandler(
+    filename = function() { 
+      paste('AMUSE_raw_with_NA_ND_dataset', format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss"), '.zip', sep='') 
+    },
+    content = function(file) {
+      print(file)
+      setwd(tempdir())
+      df <- datasetRawNand()
+      saveTime <- format(Sys.time(), "%Y-%m-%d_%Hh%Mm%Ss")
+      baseFile <- paste('AMUSE_raw_with_NA_ND_dataset', saveTime, sep='')
+      # process csv file
+      csvFile <- paste(baseFile, '.csv', sep='')
+      write.csv2(df, csvFile, row.names=FALSE)
+      print(csvFile)
+      
+      # process metadata file
+      metadataFile <- paste(baseFile, '_metadata.txt', sep='')
+      sink(metadataFile)
+      cat(paste("Dataset File: ", csvFile, "\n",sep=''))
+      cat(paste("Metadata File: ", metadataFile, "\n",sep=''))
+      cat(paste("Date: ", saveTime, "\n",sep=''))
+      cat("AMUSE_raw_with_NA_ND_dataset\n")
+      cat("DataTable dimensions: ")
+      cat(dim(df), "\n")
+      cat("Contact: Joseph.Tran@versailles.inra.fr\n")
+      sink()
+      
+      # zip
+      zip(zipfile=file, files=c(csvFile, metadataFile))
+    },
+    contentType = "application/zip"
+  )
 })
