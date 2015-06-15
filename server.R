@@ -508,28 +508,28 @@ shinyServer(function(input, output, session) {
                 min = min_ozn_mean, max = max_ozn_mean, value = c(min_ozn_mean, max_ozn_mean))
   })
   
-  #### Molecular weight range slider ###########################################
-  output$dynamic_mw_slider <- renderUI({
-    if (!"MW" %in% input$show_mucilbiochcols)
+  #### Mean Molar Mass range slider ###########################################
+  output$dynamic_mm_slider <- renderUI({
+    if (!"MM" %in% input$show_mucilbiochcols)
       return()
-    min_mw <- min(db.bioch.all.clean$MW)
-    max_mw <- max(db.bioch.all.clean$MW)
-    sliderInput("mw_range", strong("MW range:"),
-                min = min_mw, max = max_mw, value = c(min_mw, max_mw))
+    min_mm <- min(db.bioch.all.clean$MM, na.rm = TRUE)
+    max_mm <- max(db.bioch.all.clean$MM, na.rm = TRUE)
+    sliderInput("mm_range", strong("MM range:"),
+                min = min_mm, max = max_mm, value = c(min_mm, max_mm))
   })
   
-  #### Molecular weight mean range slider
-  output$dynamic_mw_mean_slider <- renderUI({
-    if (!"MW" %in% input$show_mucilbiochsummarycols)
+  #### Mean Molar Mass mean range slider
+  output$dynamic_mm_mean_slider <- renderUI({
+    if (!"MM" %in% input$show_mucilbiochsummarycols)
       return()
     group_by_culture <- summaryByCulture()
     if (!is.null(group_by_culture)) {
       db.bioch.4p.summary <- group_by_culture
     }
-    min_mw_mean <- min(db.bioch.4p.summary$MW_mean)-0.5
-    max_mw_mean <- max(db.bioch.4p.summary$MW_mean)+0.5
-    sliderInput("mw_mean_range", strong("MW mean range:"),
-                min = min_mw_mean, max = max_mw_mean, value = c(min_mw_mean, max_mw_mean))
+    min_mm_mean <- min(db.bioch.4p.summary$MM_mean)-0.5
+    max_mm_mean <- max(db.bioch.4p.summary$MM_mean)+0.5
+    sliderInput("mm_mean_range", strong("MM mean range:"),
+                min = min_mm_mean, max = max_mm_mean, value = c(min_mm_mean, max_mm_mean))
   })
   
   #### Intrinsic viscosity range slider ###########################################
@@ -665,11 +665,11 @@ shinyServer(function(input, output, session) {
         )
     }
     
-    #### filter Molecular weight range ###########################################
-    if ("MW" %in% input$show_mucilbiochcols) {
+    #### filter Mean Molar Mass range ###########################################
+    if ("MM" %in% input$show_mucilbiochcols) {
       mucilbioch <- mucilbioch %>%
         filter(
-          MW >= input$mw_range[1] & MW <= input$mw_range[2]
+          MM >= input$mm_range[1] & MM <= input$mm_range[2]
         )
     }
     
@@ -737,8 +737,8 @@ shinyServer(function(input, output, session) {
         cat(paste("#Gal_A range: ", input$gala_range[1], ':', input$gala_range[2], "\n", sep=''))
       if ("OsesNeutres" %in% input$show_mucilbiochcols)
         cat(paste("#OsesNeutres range: ", input$ozn_range[1], ":", input$ozn_range[2], "\n", sep=''))      
-      if ("MW" %in% input$show_mucilbiochcols)
-        cat(paste("#MW range: ", input$mw_range[1], ":", input$mw_range[2], "\n", sep=''))
+      if ("MM" %in% input$show_mucilbiochcols)
+        cat(paste("#MM range: ", input$mm_range[1], ":", input$mm_range[2], "\n", sep=''))
       if ("IV" %in% input$show_mucilbiochcols)
         cat(paste("#IV range: ", input$iv_range[1], ":", input$iv_range[2], "\n", sep=''))
       if ("RG" %in% input$show_mucilbiochcols)
@@ -759,7 +759,7 @@ shinyServer(function(input, output, session) {
     if (input$groupByCulture) {
       db.bioch.4p.summary <- db.bioch.all.clean %>%
         filter(AV %in% p4$AV) %>%
-        select(NAME, AV, Culture, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+        select(NAME, AV, Culture, Gal_A, OsesNeutres, MM, IV, RG, RH) %>%
         group_by(NAME, AV, Culture) %>%
         summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
       
@@ -832,11 +832,11 @@ shinyServer(function(input, output, session) {
           )
       }
       
-      #### filter Molecular weight mean range ###########################################
-      if ("MW" %in% input$show_mucilbiochsummarycols) {
+      #### filter Mean Molar Mass mean range ###########################################
+      if ("MM" %in% input$show_mucilbiochsummarycols) {
         mucilbiochsummary <- mucilbiochsummary %>%
           filter(
-            MW_mean >= input$mw_mean_range[1] & MW_mean <= input$mw_mean_range[2]
+            MM_mean >= input$mm_mean_range[1] & MM_mean <= input$mm_mean_range[2]
           )
       }    
       
@@ -905,8 +905,8 @@ shinyServer(function(input, output, session) {
         cat(paste("#Gal_A mean range: ", input$gala_mean_range[1], ':', input$gala_mean_range[2], "\n", sep=''))
       if ("OsesNeutres" %in% input$show_mucilbiochsummarycols)
         cat(paste("#OsesNeutres mean range: ", input$ozn_mean_range[1], ":", input$ozn_mean_range[2], "\n", sep=''))      
-      if ("MW" %in% input$show_mucilbiochsummarycols)
-        cat(paste("#MW mean range: ", input$mw_mean_range[1], ":", input$mw_mean_range[2], "\n", sep=''))
+      if ("MM" %in% input$show_mucilbiochsummarycols)
+        cat(paste("#MM mean range: ", input$mm_mean_range[1], ":", input$mm_mean_range[2], "\n", sep=''))
       if ("IV" %in% input$show_mucilbiochsummarycols)
         cat(paste("#IV mean range: ", input$iv_mean_range[1], ":", input$iv_mean_range[2], "\n", sep=''))
       if ("RG" %in% input$show_mucilbiochsummarycols)
