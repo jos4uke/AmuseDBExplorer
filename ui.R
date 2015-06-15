@@ -172,10 +172,10 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
               )
             ),
           column(4,
-            #### filtering Molecular weight dataset #########################################
+            #### filtering Mean Molar Mass dataset #########################################
             conditionalPanel(
-              'input.show_mucilbiochcols.indexOf("MW") >= 0',
-              uiOutput("dynamic_mw_slider")
+              'input.show_mucilbiochcols.indexOf("MM") >= 0',
+              uiOutput("dynamic_mm_slider")
               ),
             #### filtering Intrinsic viscosity dataset #########################################
             conditionalPanel(
@@ -270,10 +270,10 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
               )
               ),
             column(4,
-              #### filtering Molecular weight mean dataset #########################################
+              #### filtering Mean Molar Mass mean dataset #########################################
               conditionalPanel(
-               'input.show_mucilbiochsummarycols.indexOf("MW") >= 0',
-               uiOutput("dynamic_mw_mean_slider")
+               'input.show_mucilbiochsummarycols.indexOf("MM") >= 0',
+               uiOutput("dynamic_mm_mean_slider")
               ),
               #### filtering Intrinsic viscosity mean dataset #########################################
               conditionalPanel(

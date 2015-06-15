@@ -73,7 +73,7 @@ colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
 con <- odbcConnect("Amuse")
 
 # sql
-sql <- "select g.acc_name, g.av_nr, p.culture, p.seed_pool, d.repet_nr, b.gal_a, b.oz_n, b.mw, b.iv, b.rg, b.rh, g.city, g.country
+sql <- "select g.acc_name, g.av_nr, p.culture, p.seed_pool, d.repet_nr, b.gal_a, b.oz_n, b.mm, b.iv, b.rg, b.rh, g.city, g.country
 from am_genotype as g
 join am_plant as p on p.am_genotype_id=g.id
 join am_data as d on d.am_plant_id=p.id
@@ -95,7 +95,7 @@ db.bioch.all <- db.res %>%
     RepetNbr = repet_nr,
     Gal_A = gal_a,
     OsesNeutres = oz_n,
-    MW = mw,
+    MM = mm,
     IV = iv,
     RG = rg,
     RH = rh,
@@ -110,7 +110,7 @@ db.bioch.all.clean <- db.bioch.all %>%
   filter(
     Gal_A != "ND",
     OsesNeutres != "ND",
-    MW != "ND",
+    MM != "ND",
     IV != "ND",
     RG != "ND",
     RH != "ND"
@@ -177,7 +177,7 @@ db.bioch.4p.summary <- db.bioch.all.clean %>%
 choices_mucilbiochcols <- list(
   "Galacturonic Acid" = 'Gal_A',
   "Neutral oses" = 'OsesNeutres',
-  "Molecular weight" = 'MW',
+  "Mean Molar Mass" = 'MM',
   "Intrinsic viscosity" = 'IV',
   "Giration radius" = 'RG',
   "Hydrodynamic radius" = 'RH'
