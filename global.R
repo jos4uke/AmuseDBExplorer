@@ -150,7 +150,7 @@ choices_acc_names$All <- "All"
 
 # 4 plants accessions w/o missing values
 ## count plants by accession
-p4 <- db.bioch.all.clean %>%
+p4 <- db.bioch.all %>%
   count(AV, sort = TRUE) %>%
   filter(n == 4) %>%
   select(AV)
