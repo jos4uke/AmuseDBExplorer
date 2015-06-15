@@ -160,18 +160,18 @@ p4 <- db.bioch.all %>%
 
 # 4 plants accessions summary
 Q1 <- function(x){
-  quantile(x)[2]
+  quantile(x, na.rm=TRUE)[2]
 }
 
 Q3 <- function(x){
-  quantile(x)[4]
+  quantile(x, na.rm=TRUE)[4]
 }
 
 db.bioch.4p.summary <- db.bioch.all.clean %>%
   filter(AV %in% p4$AV) %>%
-  select(NAME, AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+  select(NAME, AV, Gal_A, OsesNeutres, MM, IV, RG, RH) %>%
   group_by(NAME, AV) %>%
-  summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
+  summarise_each(funs(min(., na.rm = TRUE), Q1, median(., na.rm = TRUE), mean(., na.rm = TRUE), Q3, max(., na.rm = TRUE), IQR(., na.rm = TRUE), sd(., na.rm = TRUE)))
   
 # choices in mucilbiochcols select box
 choices_mucilbiochcols <- list(
