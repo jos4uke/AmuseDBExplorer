@@ -127,7 +127,13 @@ db.bioch.all.clean[,6:11] <- sapply(6:11, function(i){
 # incomplete datasets
 db.bioch.incomplete <- db.bioch.all %>%
   filter(
-    !(AV %in% unique(db.bioch.all.clean$AV)) 
+#     !(AV %in% unique(db.bioch.all.clean$AV)) # not satisfying
+      !(Gal_A != "ND") | is.na(Gal_A) | is.null(Gal_A) |
+      !(OsesNeutres != "ND") | is.na(OsesNeutres) | is.null(OsesNeutres) |  
+      !(MM != "ND") | is.na(MM) | is.null(MM) |
+      !(IV != "ND") | is.na(IV) | is.null(IV) |
+      !(RG != "ND") | is.na(RG) | is.null(RG) |
+      !(RH != "ND") | is.na(RH) | is.null(RH)
     ) 
 
 # controls
