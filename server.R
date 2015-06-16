@@ -193,8 +193,22 @@ shinyServer(function(input, output, session) {
     if(is.null(input$map_bounds)) {
       c(24, 28)
     } else {
-      map_bounds <- input$map_bounds
-      c((map_bounds$north + map_bounds$south)/2.0,(map_bounds$east + map_bounds$west)/2.0)
+      # Accessions in bound
+      req_acc <- accessionsInBounds()
+      if (nrow(req_acc) == 0)
+        return()
+
+      # fitsbound
+      if ( length(req_acc$AV) == 1 ) {
+        c(req_acc$LATITUDE, req_acc$LONGITUDE)
+      } else if (length(req_acc$AV) > 0) {
+        sw_margin <- 5
+        ne_margin <- 5
+        sw <- list(lat1=min(req_acc$LATITUDE), lng1=min(req_acc$LONGITUDE))
+        ne <- list(lat2=max(req_acc$LATITUDE), lng2=max(req_acc$LONGITUDE))
+
+        c(mean(sw$lat1,ne$lat2), mean(sw$lng1,ne$lng2))
+      }
     }
   })
   
