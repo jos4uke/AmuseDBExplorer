@@ -167,7 +167,23 @@ shinyServer(function(input, output, session) {
     }
     return(y)
   })
+  
+  requested_accessions <- reactive({
+    x <- input_avs_map()  
     
+    # Requested accessions
+    #if x !(All|""|NA|NULL) draw circles around markers
+    if ( !( x == "All" ||  x == "" || is.null(x) || is.na(x) ) ) {
+      # get accessions
+      req_acc <- db.climate.geoloc %>%
+        filter(
+          AV %in% x            
+        )
+      return(req_acc)
+    }
+    return()
+  })
+  
   ### Create the map 
   map <- createLeafletMap(session, "map")
   
@@ -193,8 +209,22 @@ shinyServer(function(input, output, session) {
     if(is.null(input$map_bounds)) {
       c(24, 28)
     } else {
-      map_bounds <- input$map_bounds
-      c((map_bounds$north + map_bounds$south)/2.0,(map_bounds$east + map_bounds$west)/2.0)
+      # Accessions in bound
+      req_acc <- accessionsInBounds()
+      if (nrow(req_acc) == 0)
+        return()
+
+      # fitsbound
+      if ( length(req_acc$AV) == 1 ) {
+        c(req_acc$LATITUDE, req_acc$LONGITUDE)
+      } else if (length(req_acc$AV) > 0) {
+        sw_margin <- 5
+        ne_margin <- 5
+        sw <- list(lat1=min(req_acc$LATITUDE), lng1=min(req_acc$LONGITUDE))
+        ne <- list(lat2=max(req_acc$LATITUDE), lng2=max(req_acc$LONGITUDE))
+
+        c(mean(sw$lat1,ne$lat2), mean(sw$lng1,ne$lng2))
+      }
     }
   })
   
@@ -219,39 +249,15 @@ shinyServer(function(input, output, session) {
     acc_in_bounds
   })
   
-#   observe({
-#     map$clearMarkers()
-#     map$clearShapes()
-#     
-#     accessions <- accessionsInBounds()
-#     if (nrow(accessionsInBounds()) == 0)
-#       return()
-#     
-#     geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
-#     qual_colors <- c("green", "orange", "blue", "black")
-#     names(qual_colors) <- geoloc_qual
-#     colors <- qual_colors[db.climate.geoloc$GEOLOC_QUAL]
-#     acc_colors <- colors[match(accessions$AV, db.climate.geoloc$AV)]
-#     names(acc_colors) <- c() # reset names to get indexes back when add marks
-# 
-#     map$addCircleMarker(
-#       accessions$LATITUDE,
-#       accessions$LONGITUDE,
-#       rep(6, length(accessions)),
-#       accessions$AV,
-#       list(stroke=FALSE, fill=TRUE, fillOpacity=0.7),
-#       list(color=acc_colors)
-#     )
-#   })
-  
-  
-  # session$onFlushed is necessary to work around a bug in the Shiny/Leaflet
-  # integration; without it, the addCircle commands arrive in the browser
-  # before the map is created.
-  session$onFlushed(once=TRUE, function() {   
-    drawAccessions <- observe({
-      x <- input_avs_map()
-      
+# session$onFlushed is necessary to work around a bug in the Shiny/Leaflet
+# integration; without it, the addCircle commands arrive in the browser
+# before the map is created.
+  session$onFlushed(once=TRUE, function() { 
+    # clear the map and center on requested accessions zone
+    clearAndMove <- observe({
+      req_acc <- requested_accessions()
+      if (is.null(req_acc))
+        return()
       # TODO list:
       # is x all the accessions?
       ## yes: get accessions in bound and draw markers by geoloc_qual
@@ -259,24 +265,15 @@ shinyServer(function(input, output, session) {
       ### get requested accessions coordinates and fits the new bounds: southwest=min(lat, lng)-sw_margins and northeast=max(lat, lng)+ne_margins
       ### highlight the requested accessions in yellow circles for example
       ### get accessions in bound in the new bounds and draw markers
-      
-      # Clear existing marks/circles/popups before drawing
-      map$clearMarkers()
-      map$clearShapes()
-      map$clearPopups()
-      
-      # Requested accessions
-      #if x !(All|""|NA|NULL) draw circles around markers
-      if ( !( x == "All" ||  x == "" || is.null(x) || is.na(x) ) ) {
-        # get accessions
-        req_acc <- db.climate.geoloc %>%
-          filter(
-            AV %in% x            
-            )
-        
+      isolate({
+        # Clear existing marks/circles/popups before drawing
+        map$clearMarkers()
+        map$clearShapes()
+        map$clearPopups()
+            
         # fitsbound
         if ( length(req_acc$AV) == 1 ) {
-#           map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, zoom(), forceReset = FALSE)
+          #           map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, 8, forceReset = TRUE)
           map$fitBounds(req_acc$LATITUDE-5, req_acc$LONGITUDE-5, req_acc$LATITUDE+5, req_acc$LONGITUDE+5)
         } else if (length(req_acc$AV) > 0) {
           sw_margin <- 5
@@ -286,31 +283,34 @@ shinyServer(function(input, output, session) {
           # both methods prevent to zoom and browse the map
           map$fitBounds(sw$lat1-sw_margin, sw$lng1-sw_margin, ne$lat2+ne_margin, ne$lng2+ne_margin)
           # idem using setview: cannot zoom or browse map
-#           map$setView(mean(sw$lat1,ne$lat2), mean(sw$lng1,ne$lng2), zoom())
+          #         map$setView(mean(sw$lat1,ne$lat2), mean(sw$lng1,ne$lng2), zoom(), forceReset = FALSE)
         }
-      }
-      
+      })
+    })
+     
+    # draw accessions
+    drawAccessions <- observe({
       # Accessions in bound
       accessions <- accessionsInBounds()
-      if (nrow(accessionsInBounds()) == 0)
+      if (nrow(accessions) == 0)
         return()
-
-#       # Define colors: moved to global.R
-#       geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
-#       qual_colors <- c("green", "orange", "blue", "grey")
-#       names(qual_colors) <- geoloc_qual
-#       colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
+      
+      #       # Define colors: moved to global.R
+      #       geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
+      #       qual_colors <- c("green", "orange", "blue", "grey")
+      #       names(qual_colors) <- geoloc_qual
+      #       colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
       acc_colors <- colors[match(accessions$AV, db.climate.geoloc$AV)]
       names(acc_colors) <- c() # reset names to get indexes back when add marks
       
-#       map$addCircleMarker(
-#         accessions$LATITUDE,
-#         accessions$LONGITUDE,
-#         rep(6, length(accessions)),
-#         accessions$AV,
-#         list(stroke=FALSE, fill=TRUE, fillOpacity=0.7),
-#         list(color=acc_colors)
-#       )
+      #       map$addCircleMarker(
+      #         accessions$LATITUDE,
+      #         accessions$LONGITUDE,
+      #         rep(6, length(accessions)),
+      #         accessions$AV,
+      #         list(stroke=FALSE, fill=TRUE, fillOpacity=0.7),
+      #         list(color=acc_colors)
+      #       )
       
       # Draw in batches of 100; makes the app feel a bit more responsive
       chunksize <- 100
@@ -330,29 +330,30 @@ shinyServer(function(input, output, session) {
           )
         )
       }
-
-      # if requested accessions, delay drawing
-      if ( !( x == "All" ||  x == "" || is.null(x) || is.na(x) ) ) {
-        # highlight and popup
-        map$addMarker(
-          req_acc$LATITUDE, req_acc$LONGITUDE,
-          req_acc$AV,
-          list(riseOnHover=TRUE, fillOpacity=0.9),
-          list(title=req_acc$AV, alt=req_acc$NAME)
-        )
-        # cannot display multiple popups at the same time (see js bindings src) => uses mouse events to display
-#         lapply(req_acc, function(x) {
-#           acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s (%s)", x[2], x[1]))),tags$br()))
-#           map$showPopup(x[6], x[7], acc_content, layerId = x[2], options=list())
-#         })
-#         acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s %s", req_acc$AV, req_acc$NAME))),tags$br()))
-#         map$showPopup(req_acc$LATITUDE, req_acc$LONGITUDE, req_acc$AV, req_acc$AV, options=list(keepInView=TRUE))
-      }
-    
+      
+      # draw requested accessions
+      req_acc <- requested_accessions()
+      if (is.null(req_acc))
+        return()
+      # highlight and popup
+      map$addMarker(
+        req_acc$LATITUDE, req_acc$LONGITUDE,
+        req_acc$AV,
+        list(riseOnHover=TRUE, fillOpacity=0.9),
+        list(title=req_acc$AV, alt=req_acc$NAME)
+      )
+      # cannot display multiple popups at the same time (see js bindings src) => uses mouse events to display
+      #         lapply(req_acc, function(x) {
+      #           acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s (%s)", x[2], x[1]))),tags$br()))
+      #           map$showPopup(x[6], x[7], acc_content, layerId = x[2], options=list())
+      #         })
+      #         acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s %s", req_acc$AV, req_acc$NAME))),tags$br()))
+      #         map$showPopup(req_acc$LATITUDE, req_acc$LONGITUDE, req_acc$AV, req_acc$AV, options=list(keepInView=TRUE))
     })
 
     # TIL this is necessary in order to prevent the observer from
     # attempting to write to the websocket after the session is gone.
+    session$onSessionEnded(clearAndMove$suspend)
     session$onSessionEnded(drawAccessions$suspend)
   })
   
