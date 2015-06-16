@@ -383,6 +383,22 @@ shinyServer(function(input, output, session) {
 
   session$onSessionEnded(mouseOverMark$suspend)
 
+  # GoToMap
+  observe({
+    if (is.null(input$goto))
+      return()
+    isolate({
+      map$clearPopups()
+      dist <- 0.5
+      av <- input$goto$av
+      lat <- input$goto$lat
+      lng <- input$goto$lng
+      showAccPopup(av, lat, lng)
+      map$fitBounds(lat - dist, lng - dist,
+                    lat + dist, lng + dist)
+    })
+  })
+
   ## Mucilage bioch data Explorer ###########################################
   
   ### input accessions AV numbers ###########################################
