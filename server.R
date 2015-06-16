@@ -983,14 +983,19 @@ shinyServer(function(input, output, session) {
         (LONGITUDE >= input$long_range[1] & LONGITUDE <= input$long_range[2]) | is.na(LONGITUDE)
       ) 
     
+    #### add gotomap ###########################################
+    geoclimato <- geoclimato %>%
+      mutate(GotoMap = paste('<a class="go-map" href="" data-lat="', LATITUDE, '" data-long="', LONGITUDE, '" data-av="', AV, '"><i class="fa fa-crosshairs"></i></a>', sep=""))
+    
     # return at last
-    geoclimato
+    geoclimato[,c(1:8, ncol(geoclimato), 9:ncol(geoclimato)-1)]
   })
 
   output$geoclimato <- renderDataTable({
     datasetClimate()
   },
-  options = list(orderClasses = TRUE)
+  options = list(orderClasses = TRUE),
+  escape = FALSE
   )
 
   output$downloadClimateData <- downloadHandler(
