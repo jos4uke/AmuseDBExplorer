@@ -43,28 +43,26 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
                                    selected = "All",
                                    multiple = TRUE),
                     hr(),
-                    h4("Map informations"),
+                    h4("Map information"),
                     htmlOutput(
                       outputId = 'mapdesc', inline=TRUE
                     ),
                     tags$br(),
-                    h4("Accession informations")
+                    h4("Legend"),
+                    plotOutput(outputId = 'legend', width = 200, height = 200)
       ),
       
-      # AMUSEDB infos
+      # AMUSEDB explorer frontend title
       fluidRow(
         column(8, offset=3,
-               h3(strong('AMUSEDB'), ': Arabidopsis Mucilage Natural Variability Database'),
-               htmlOutput(
-                 outputId = 'desc'
-               )
+               h3('Frontend interface to', strong('AMUSEDB'), ': Arabidopsis Mucilage Natural Variability Database')
         )
       )
     ),
     # cite
     tags$br(),
     tags$div(
-             strong('Data compiled for ', tags$em('AMUSE ANR project 2009-2012 (Helen North, IJPB/INRA)'), ' by Joseph Tran (IJPB/INRA).')
+             strong('Data compiled for ', tags$em('AMUSE ANR project 2009-2012 (Helen North (IJPB/INRA Versailles) and Marie-Christine Ralet (BIA/INRA Nantes))'), ' by Joseph Tran (IJPB/INRA Versailles).')
     )
   ),
   
@@ -85,7 +83,7 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
       fluidRow(
         column(4,
            selectInput("dataset", label = strong("Select dataset"), 
-                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary", "Geo-climato dataset" = "geoclimato"), 
+                       choices = list("Raw dataset" = "raw", "Summary dataset" = "summary", "Geo-climato dataset" = "geoclimato", "Incomplete dataset" = "incomplete"), 
                        selected = list("Raw dataset" = "raw"))
                )
         ),
@@ -102,7 +100,11 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
         'input.dataset === "geoclimato"',
         tags$div("Geoclimato tab view provides geo-localisation and climate datasets by accession."),
         tags$a(href="https://www.pik-potsdam.de/members/cramer/climate", "(Cramer&Leemans database, version 2.1)")
-      ),  
+      ),
+      conditionalPanel(
+        'input.dataset === "incomplete"',
+        tags$div("Incomplete tab view provides incomplete datasets (raw with less than 4 plants, with NA/ND values, geoclimato without gps coordinates).")
+      ),
       ### constant #########################################
       #### search by AV number
       fluidRow(
@@ -170,10 +172,10 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
               )
             ),
           column(4,
-            #### filtering Molecular weight dataset #########################################
+            #### filtering Mean Molar Mass dataset #########################################
             conditionalPanel(
-              'input.show_mucilbiochcols.indexOf("MW") >= 0',
-              uiOutput("dynamic_mw_slider")
+              'input.show_mucilbiochcols.indexOf("MM") >= 0',
+              uiOutput("dynamic_mm_slider")
               ),
             #### filtering Intrinsic viscosity dataset #########################################
             conditionalPanel(
@@ -268,10 +270,10 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
               )
               ),
             column(4,
-              #### filtering Molecular weight mean dataset #########################################
+              #### filtering Mean Molar Mass mean dataset #########################################
               conditionalPanel(
-               'input.show_mucilbiochsummarycols.indexOf("MW") >= 0',
-               uiOutput("dynamic_mw_mean_slider")
+               'input.show_mucilbiochsummarycols.indexOf("MM") >= 0',
+               uiOutput("dynamic_mm_mean_slider")
               ),
               #### filtering Intrinsic viscosity mean dataset #########################################
               conditionalPanel(
@@ -374,6 +376,77 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
         dataTableOutput("geoclimato")
         
         )
+      ),
+    
+      ### incomplete  #########################################
+      conditionalPanel(
+        'input.dataset === "incomplete"',
+        #### incomplete datasets
+        fluidRow(
+          tags$br(),
+          column(4,
+                 selectizeInput("show_incompletedatasets", label = strong("Select incomplete datasets"), 
+                                choices = choices_incompletedatasets, 
+                                selected = choices_incompletedatasets,
+                                multiple = TRUE)
+          ),
+          column(4,
+                 tags$br(),
+                 tags$div("By default, all datasets are selected. Delete dataset in the list, or select dataset from the drop-down menu. 
+                          Multiple choice is allowed.")
+                 )
+          ),
+        tags$hr(),
+        tags$h2("Results"),
+        #### raw with less than 4 plants
+        conditionalPanel('input.show_incompletedatasets.indexOf("rlt4p") >= 0',
+          tags$h3("raw with less than 4 plants dataset"),
+          wellPanel(
+            tags$div("Download the raw dataset with less than 4 plants dataset results in csv format in zipped archive."),
+            downloadButton('downloadRawLessThan4PlantsData', 'Download zip file')
+          ),
+          tags$br(),
+          dataTableOutput("rlt4p")
+        ),
+        tags$br(),
+        #### raw with NA/ND values
+        conditionalPanel('input.show_incompletedatasets.indexOf("rnand") >= 0',
+          tags$h3("raw with NA/ND values dataset"),
+          wellPanel(
+           tags$div("Download the raw dataset with NA/ND values dataset results in csv format in zipped archive."),
+           downloadButton('downloadRawNandData', 'Download zip file')
+          ),
+          tags$br(),
+          dataTableOutput("rnand")
+        ),
+        tags$br(),
+        #### geoclimato without gps coordinates
+        conditionalPanel('input.show_incompletedatasets.indexOf("gnogps") >= 0',
+          tags$h3("geoclimato without gps coordinates dataset"),
+          wellPanel(
+           tags$div("Download the geoclimato dataset without gps coordinates dataset results in csv format in zipped archive."),
+           downloadButton('downloadGeoclimatoNoGpsData', 'Download zip file')
+          ),
+          tags$br(),
+          dataTableOutput("gnogps")
+        ),
+        tags$br()
+        #### geoclimato with NA/ND values
+        
       )
-    )
+    ),
+
+  tabPanel("Database information",
+   fluidPage(
+     # AMUSEDB infos
+     fluidRow(
+       column(8, offset=3,
+              h3(strong('AMUSEDB'), ': Arabidopsis Mucilage Natural Variability Database'),
+              htmlOutput(
+                outputId = 'desc'
+              )
+       )
+     )
+   )
+  )
 ))

@@ -63,11 +63,17 @@ choices_acc_names_map$All <- "All"
 choices_geoloc_qual <- as.list(unique(db.climate.geoloc$GEOLOC_QUAL))
 names(choices_geoloc_qual) <- unique(db.climate.geoloc$GEOLOC_QUAL)
 
+# Define colors
+geoloc_qual <- unique(db.climate.geoloc$GEOLOC_QUAL)
+qual_colors <- c("green", "orange", "blue", "grey")
+names(qual_colors) <- geoloc_qual
+colors <- qual_colors[as.character(db.climate.geoloc$GEOLOC_QUAL)]
+
 # AmuseDB connection
 con <- odbcConnect("Amuse")
 
 # sql
-sql <- "select g.acc_name, g.av_nr, p.culture, p.seed_pool, d.repet_nr, b.gal_a, b.oz_n, b.mw, b.iv, b.rg, b.rh, g.city, g.country
+sql <- "select g.acc_name, g.av_nr, p.culture, p.seed_pool, d.repet_nr, b.gal_a, b.oz_n, b.mm, b.iv, b.rg, b.rh, g.city, g.country
 from am_genotype as g
 join am_plant as p on p.am_genotype_id=g.id
 join am_data as d on d.am_plant_id=p.id
@@ -89,7 +95,7 @@ db.bioch.all <- db.res %>%
     RepetNbr = repet_nr,
     Gal_A = gal_a,
     OsesNeutres = oz_n,
-    MW = mw,
+    MM = mm,
     IV = iv,
     RG = rg,
     RH = rh,
@@ -104,7 +110,7 @@ db.bioch.all.clean <- db.bioch.all %>%
   filter(
     Gal_A != "ND",
     OsesNeutres != "ND",
-    MW != "ND",
+    MM != "ND",
     IV != "ND",
     RG != "ND",
     RH != "ND"
@@ -121,7 +127,13 @@ db.bioch.all.clean[,6:11] <- sapply(6:11, function(i){
 # incomplete datasets
 db.bioch.incomplete <- db.bioch.all %>%
   filter(
-    !(AV %in% unique(db.bioch.all.clean$AV)) 
+#     !(AV %in% unique(db.bioch.all.clean$AV)) # not satisfying
+      !(Gal_A != "ND") | is.na(Gal_A) | is.null(Gal_A) |
+      !(OsesNeutres != "ND") | is.na(OsesNeutres) | is.null(OsesNeutres) |  
+      !(MM != "ND") | is.na(MM) | is.null(MM) |
+      !(IV != "ND") | is.na(IV) | is.null(IV) |
+      !(RG != "ND") | is.na(RG) | is.null(RG) |
+      !(RH != "ND") | is.na(RH) | is.null(RH)
     ) 
 
 # controls
@@ -138,7 +150,7 @@ choices_acc_names$All <- "All"
 
 # 4 plants accessions w/o missing values
 ## count plants by accession
-p4 <- db.bioch.all.clean %>%
+p4 <- db.bioch.all %>%
   count(AV, sort = TRUE) %>%
   filter(n == 4) %>%
   select(AV)
@@ -148,24 +160,24 @@ p4 <- db.bioch.all.clean %>%
 
 # 4 plants accessions summary
 Q1 <- function(x){
-  quantile(x)[2]
+  quantile(x, na.rm=TRUE)[2]
 }
 
 Q3 <- function(x){
-  quantile(x)[4]
+  quantile(x, na.rm=TRUE)[4]
 }
 
 db.bioch.4p.summary <- db.bioch.all.clean %>%
   filter(AV %in% p4$AV) %>%
-  select(NAME, AV, Gal_A, OsesNeutres, MW, IV, RG, RH) %>%
+  select(NAME, AV, Gal_A, OsesNeutres, MM, IV, RG, RH) %>%
   group_by(NAME, AV) %>%
-  summarise_each(funs(min, Q1, median, mean, Q3, max, IQR, sd))
+  summarise_each(funs(min(., na.rm = TRUE), Q1, median(., na.rm = TRUE), mean(., na.rm = TRUE), Q3, max(., na.rm = TRUE), IQR(., na.rm = TRUE), sd(., na.rm = TRUE)))
   
 # choices in mucilbiochcols select box
 choices_mucilbiochcols <- list(
   "Galacturonic Acid" = 'Gal_A',
   "Neutral oses" = 'OsesNeutres',
-  "Molecular weight" = 'MW',
+  "Mean Molar Mass" = 'MM',
   "Intrinsic viscosity" = 'IV',
   "Giration radius" = 'RG',
   "Hydrodynamic radius" = 'RH'
@@ -186,3 +198,10 @@ choices_summarycols <- list(
 # no 4p accessions
 db.bioch.no4p <- db.bioch.all.clean %>%
   filter(!(AV %in% p4$AV))
+
+# choices in incomplete
+choices_incompletedatasets <- list(
+  "raw with less than 4 plants" = "rlt4p",
+  "raw with NA/ND values" = "rnand",
+  "geoclimato without gps coordinates" = "gnogps"
+  )
