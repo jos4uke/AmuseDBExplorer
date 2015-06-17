@@ -20,13 +20,7 @@ $(document).ready(function() {
   // reset function
   function resetGoto(){
     //alert("resetgomap clicked");
-    Shiny.onInputChange("goto", {
-      lat: null,
-      lng: null,
-      av: null,
-      name: null,
-      nonce: null
-    });
+    Shiny.onInputChange("goto", null);
   }
   
   // reset locator icon when reset button is clicked: not working
