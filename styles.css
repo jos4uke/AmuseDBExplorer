@@ -43,6 +43,17 @@ h1, h2, h3, h4 { font-weight: 400; }
   font-size: 12px;
 }
 
+#gotomap {
+  display: table;
+  width: 7em;
+}
+
+.go-map {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
 /* If not using map tiles, show a white background */
 .leaflet-container {
   background-color: white !important;

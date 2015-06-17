@@ -272,12 +272,12 @@ shinyServer(function(input, output, session) {
         map$clearPopups()
             
         # fitsbound
+        sw_margin <- 0.5
+        ne_margin <- 0.5
         if ( length(req_acc$AV) == 1 ) {
           #           map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, 8, forceReset = TRUE)
-          map$fitBounds(req_acc$LATITUDE-5, req_acc$LONGITUDE-5, req_acc$LATITUDE+5, req_acc$LONGITUDE+5)
+          map$fitBounds(req_acc$LATITUDE-sw_margin, req_acc$LONGITUDE-sw_margin, req_acc$LATITUDE+ne_margin, req_acc$LONGITUDE+ne_margin)
         } else if (length(req_acc$AV) > 0) {
-          sw_margin <- 5
-          ne_margin <- 5
           sw <- list(lat1=min(req_acc$LATITUDE), lng1=min(req_acc$LONGITUDE))
           ne <- list(lat2=max(req_acc$LATITUDE), lng2=max(req_acc$LONGITUDE))
           # both methods prevent to zoom and browse the map
@@ -290,6 +290,8 @@ shinyServer(function(input, output, session) {
      
     # draw accessions
     drawAccessions <- observe({
+      map$clearMarkers()
+      
       # Accessions in bound
       accessions <- accessionsInBounds()
       if (nrow(accessions) == 0)
@@ -330,25 +332,36 @@ shinyServer(function(input, output, session) {
           )
         )
       }
-      
+            
       # draw requested accessions
       req_acc <- requested_accessions()
-      if (is.null(req_acc))
-        return()
-      # highlight and popup
-      map$addMarker(
-        req_acc$LATITUDE, req_acc$LONGITUDE,
-        req_acc$AV,
-        list(riseOnHover=TRUE, fillOpacity=0.9),
-        list(title=req_acc$AV, alt=req_acc$NAME)
-      )
-      # cannot display multiple popups at the same time (see js bindings src) => uses mouse events to display
-      #         lapply(req_acc, function(x) {
-      #           acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s (%s)", x[2], x[1]))),tags$br()))
-      #           map$showPopup(x[6], x[7], acc_content, layerId = x[2], options=list())
-      #         })
-      #         acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s %s", req_acc$AV, req_acc$NAME))),tags$br()))
-      #         map$showPopup(req_acc$LATITUDE, req_acc$LONGITUDE, req_acc$AV, req_acc$AV, options=list(keepInView=TRUE))
+      if (!is.null(req_acc)) {
+        # highlight and popup
+        map$addMarker(
+          req_acc$LATITUDE, req_acc$LONGITUDE,
+          req_acc$AV,
+          list(riseOnHover=TRUE, fillOpacity=0.9),
+          list(title=req_acc$AV, alt=req_acc$NAME)
+        )
+        # cannot display multiple popups at the same time (see js bindings src) => uses mouse events to display
+        #         lapply(req_acc, function(x) {
+        #           acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s (%s)", x[2], x[1]))),tags$br()))
+        #           map$showPopup(x[6], x[7], acc_content, layerId = x[2], options=list())
+        #         })
+        #         acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s %s", req_acc$AV, req_acc$NAME))),tags$br()))
+        #         map$showPopup(req_acc$LATITUDE, req_acc$LONGITUDE, req_acc$AV, req_acc$AV, options=list(keepInView=TRUE))        
+      }
+
+      # draw goto marker
+      gotoacc <- gotoAcc()
+      if (!is.null(gotoacc)) {
+        map$addMarker(
+          gotoacc$lat, gotoacc$lng,
+          gotoacc$av,
+          list(riseOnHover=TRUE, fillOpacity=0.9),
+          list(title=gotoacc$av, alt=gotoacc$name)
+        )
+      }
     })
 
     # TIL this is necessary in order to prevent the observer from
@@ -368,7 +381,7 @@ shinyServer(function(input, output, session) {
     ))
     map$showPopup(lat, lng, content, acc)
   }
-  
+
   # When mark is mouseover, show popup with accession infos: AV number, name
   mouseOverMark <- observe({
     map$clearPopups()
@@ -382,6 +395,34 @@ shinyServer(function(input, output, session) {
   })
 
   session$onSessionEnded(mouseOverMark$suspend)
+
+  # GoToMap
+  gotoAcc <- reactive({
+    if (is.null(input$goto))
+      return()
+    input$goto
+  })
+
+  gotomap <- observe({
+    gotoacc <- gotoAcc()
+    if (is.null(gotoacc))
+      return()
+    isolate({
+      map$clearMarkers()
+      map$clearPopups()
+      dist <- 0.5
+      av <- gotoacc$av
+      lat <- gotoacc$lat
+      lng <- gotoacc$lng
+      name <- gotoacc$name
+      showAccPopup(av, lat, lng)
+      map$fitBounds(lat - dist, lng - dist,
+                    lat + dist, lng + dist)   
+      
+    })
+  })
+
+  session$onSessionEnded(gotomap$suspend)
 
   ## Mucilage bioch data Explorer ###########################################
   
@@ -967,14 +1008,19 @@ shinyServer(function(input, output, session) {
         (LONGITUDE >= input$long_range[1] & LONGITUDE <= input$long_range[2]) | is.na(LONGITUDE)
       ) 
     
+    #### add gotomap ###########################################
+    geoclimato <- geoclimato %>%
+      mutate(`Go to map` = paste('<a id="gotomap" class="go-map" href="" data-lat="', LATITUDE, '" data-long="', LONGITUDE, '" data-av="', AV, '" data-name="', NAME, '"><i class="fa fa-map-marker fa-2x"></i></a>', sep=""))
+    
     # return at last
-    geoclimato
+    geoclimato[,c(1:8, ncol(geoclimato), 9:(ncol(geoclimato)-1))]
   })
 
   output$geoclimato <- renderDataTable({
     datasetClimate()
   },
-  options = list(orderClasses = TRUE)
+  options = list(orderClasses = TRUE),
+  escape = FALSE
   )
 
   output$downloadClimateData <- downloadHandler(
