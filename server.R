@@ -370,7 +370,7 @@ shinyServer(function(input, output, session) {
     ))
     map$showPopup(lat, lng, content, acc)
   }
-  
+
   # When mark is mouseover, show popup with accession infos: AV number, name
   mouseOverMark <- observe({
     map$clearPopups()
@@ -386,20 +386,32 @@ shinyServer(function(input, output, session) {
   session$onSessionEnded(mouseOverMark$suspend)
 
   # GoToMap
-  observe({
+  gotoAcc <- reactive({
     if (is.null(input$goto))
       return()
+    input$goto
+  })
+
+  gotomap <- observe({
+    gotoacc <- gotoAcc()
+    if (is.null(gotoacc))
+      return()
     isolate({
+      map$clearMarkers()
       map$clearPopups()
       dist <- 0.5
-      av <- input$goto$av
-      lat <- input$goto$lat
-      lng <- input$goto$lng
+      av <- gotoacc$av
+      lat <- gotoacc$lat
+      lng <- gotoacc$lng
+      name <- gotoacc$name
       showAccPopup(av, lat, lng)
       map$fitBounds(lat - dist, lng - dist,
-                    lat + dist, lng + dist)
+                    lat + dist, lng + dist)   
+      
     })
   })
+
+  session$onSessionEnded(gotomap$suspend)
 
   ## Mucilage bioch data Explorer ###########################################
   
