@@ -290,6 +290,8 @@ shinyServer(function(input, output, session) {
      
     # draw accessions
     drawAccessions <- observe({
+      map$clearMarkers()
+      
       # Accessions in bound
       accessions <- accessionsInBounds()
       if (nrow(accessions) == 0)
