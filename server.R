@@ -987,10 +987,10 @@ shinyServer(function(input, output, session) {
     
     #### add gotomap ###########################################
     geoclimato <- geoclimato %>%
-      mutate(GotoMap = paste('<a class="go-map" href="" data-lat="', LATITUDE, '" data-long="', LONGITUDE, '" data-av="', AV, '"><i class="fa fa-crosshairs"></i></a>', sep=""))
+      mutate(`Go to map` = paste('<a id="gotomap" class="go-map" href="" data-lat="', LATITUDE, '" data-long="', LONGITUDE, '" data-av="', AV, '" data-name="', NAME, '"><i class="fa fa-map-marker fa-2x"></i></a>', sep=""))
     
     # return at last
-    geoclimato[,c(1:8, ncol(geoclimato), 9:ncol(geoclimato)-1)]
+    geoclimato[,c(1:8, ncol(geoclimato), 9:(ncol(geoclimato)-1))]
   })
 
   output$geoclimato <- renderDataTable({
