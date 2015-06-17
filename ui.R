@@ -49,7 +49,13 @@ shinyUI(navbarPage(strong("AmuseDBExplorer"), id="nav",
                     ),
                     tags$br(),
                     h4("Legend"),
-                    plotOutput(outputId = 'legend', width = 200, height = 200)
+                    plotOutput(outputId = 'legend', width = 200, height = 200),
+                    # conditional reset button
+                    conditionalPanel(
+                      '!!input.goto',
+                      tags$br(),
+                      actionButton("resetgomap", label = "Reset Go to map icon")
+                      )
       ),
       
       # AMUSEDB explorer frontend title

@@ -1,3 +1,4 @@
+$(document).ready(function() {
   // When locator icon in datatable is clicked, go to that spot on the map
   $(document).on("click", ".go-map", function(e) {
     e.preventDefault();
@@ -15,4 +16,20 @@
       nonce: Math.random()
     });
   });
+
+  // reset function
+  function resetGoto(){
+    //alert("resetgomap clicked");
+    Shiny.onInputChange("goto", {
+      lat: null,
+      lng: null,
+      av: null,
+      name: null,
+      nonce: null
+    });
+  }
+  
+  // reset locator icon when reset button is clicked: not working
+  document.getElementById("resetgomap").onclick=resetGoto;
+
 });
