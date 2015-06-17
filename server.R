@@ -272,12 +272,12 @@ shinyServer(function(input, output, session) {
         map$clearPopups()
             
         # fitsbound
+        sw_margin <- 0.5
+        ne_margin <- 0.5
         if ( length(req_acc$AV) == 1 ) {
           #           map$setView(req_acc$LATITUDE, req_acc$LONGITUDE, 8, forceReset = TRUE)
-          map$fitBounds(req_acc$LATITUDE-5, req_acc$LONGITUDE-5, req_acc$LATITUDE+5, req_acc$LONGITUDE+5)
+          map$fitBounds(req_acc$LATITUDE-sw_margin, req_acc$LONGITUDE-sw_margin, req_acc$LATITUDE+ne_margin, req_acc$LONGITUDE+ne_margin)
         } else if (length(req_acc$AV) > 0) {
-          sw_margin <- 5
-          ne_margin <- 5
           sw <- list(lat1=min(req_acc$LATITUDE), lng1=min(req_acc$LONGITUDE))
           ne <- list(lat2=max(req_acc$LATITUDE), lng2=max(req_acc$LONGITUDE))
           # both methods prevent to zoom and browse the map
