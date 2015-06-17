@@ -332,25 +332,36 @@ shinyServer(function(input, output, session) {
           )
         )
       }
-      
+            
       # draw requested accessions
       req_acc <- requested_accessions()
-      if (is.null(req_acc))
-        return()
-      # highlight and popup
-      map$addMarker(
-        req_acc$LATITUDE, req_acc$LONGITUDE,
-        req_acc$AV,
-        list(riseOnHover=TRUE, fillOpacity=0.9),
-        list(title=req_acc$AV, alt=req_acc$NAME)
-      )
-      # cannot display multiple popups at the same time (see js bindings src) => uses mouse events to display
-      #         lapply(req_acc, function(x) {
-      #           acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s (%s)", x[2], x[1]))),tags$br()))
-      #           map$showPopup(x[6], x[7], acc_content, layerId = x[2], options=list())
-      #         })
-      #         acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s %s", req_acc$AV, req_acc$NAME))),tags$br()))
-      #         map$showPopup(req_acc$LATITUDE, req_acc$LONGITUDE, req_acc$AV, req_acc$AV, options=list(keepInView=TRUE))
+      if (!is.null(req_acc)) {
+        # highlight and popup
+        map$addMarker(
+          req_acc$LATITUDE, req_acc$LONGITUDE,
+          req_acc$AV,
+          list(riseOnHover=TRUE, fillOpacity=0.9),
+          list(title=req_acc$AV, alt=req_acc$NAME)
+        )
+        # cannot display multiple popups at the same time (see js bindings src) => uses mouse events to display
+        #         lapply(req_acc, function(x) {
+        #           acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s (%s)", x[2], x[1]))),tags$br()))
+        #           map$showPopup(x[6], x[7], acc_content, layerId = x[2], options=list())
+        #         })
+        #         acc_content <- as.character(tagList(tags$strong(HTML(sprintf("%s %s", req_acc$AV, req_acc$NAME))),tags$br()))
+        #         map$showPopup(req_acc$LATITUDE, req_acc$LONGITUDE, req_acc$AV, req_acc$AV, options=list(keepInView=TRUE))        
+      }
+
+      # draw goto marker
+      gotoacc <- gotoAcc()
+      if (!is.null(gotoacc)) {
+        map$addMarker(
+          gotoacc$lat, gotoacc$lng,
+          gotoacc$av,
+          list(riseOnHover=TRUE, fillOpacity=0.9),
+          list(title=gotoacc$av, alt=gotoacc$name)
+        )
+      }
     })
 
     # TIL this is necessary in order to prevent the observer from
